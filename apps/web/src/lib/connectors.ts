@@ -24,6 +24,7 @@ export async function connectorRequest<T>(
       body === undefined ? undefined : { "Content-Type": "application/json" },
     body: body === undefined ? undefined : JSON.stringify(body),
     cache: "no-store",
+    signal: AbortSignal.timeout(30_000),
   });
   const result = (await response.json()) as T & { message?: string };
   if (!response.ok)

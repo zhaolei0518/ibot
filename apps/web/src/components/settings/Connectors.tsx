@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useState, type FormEvent } from "react";
 import {
   ArrowUpRightIcon,
   CheckIcon,
@@ -18,6 +18,12 @@ import {
 import { Section } from "../setup/Section";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogTitle,
+  DialogDescription,
+} from "../ui/dialog";
 const selectClass =
   "h-9 w-full rounded-md border border-input bg-background px-3 text-sm";
 const labels: Record<ConnectorAccount["status"], string> = {
@@ -64,8 +70,8 @@ export function Connectors() {
     } catch (e) {
       setError((e as Error).message);
     } finally {
-      await reload();
       setBusy(false);
+      await reload();
     }
   }
   return (
@@ -130,20 +136,34 @@ export function Connectors() {
         </p>
       )}
       {selected && (
-        <AccountForm
-          key={selected.id}
-          plugin={selected}
-          busy={busy}
-          oauthConfigured={data?.oauth_configured ?? false}
-          cancel={() => setSelected(undefined)}
-          submit={(body) =>
-            action(async () => {
-              await connectorRequest("connectors/accounts", "POST", body);
-              setSelected(undefined);
-              setTab("accounts");
-            })
-          }
-        />
+        <Dialog
+          open
+          onOpenChange={(open) => {
+            if (!open) setSelected(undefined);
+          }}
+        >
+          <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
+            {error && (
+              <p role="alert" className="text-sm text-destructive">
+                {error}
+              </p>
+            )}
+            <AccountForm
+              key={selected.id}
+              plugin={selected}
+              busy={busy}
+              oauthConfigured={data?.oauth_configured ?? false}
+              cancel={() => setSelected(undefined)}
+              submit={(body) =>
+                action(async () => {
+                  await connectorRequest("connectors/accounts", "POST", body);
+                  setSelected(undefined);
+                  setTab("accounts");
+                })
+              }
+            />
+          </DialogContent>
+        </Dialog>
       )}
       {tab === "catalogue" && data && (
         <>
@@ -223,15 +243,10 @@ export function Connectors() {
                     size="sm"
                     variant="outline"
                     disabled={busy}
-                    onClick={() =>
-                      void action(async () => {
-                        await connectorRequest(
-                          `connectors/plugins/${p.id}/install`,
-                          "POST",
-                        );
-                        setSelected(p);
-                      })
-                    }
+                    onClick={() => {
+                      setError("");
+                      setSelected(p);
+                    }}
                   >
                     {p.installed ? "Add account" : "Set up"}
                   </Button>
@@ -317,19 +332,9 @@ function AccountForm({
   const [endpoint, setEndpoint] = useState(plugin.endpoint ?? "");
   const [mode, setMode] = useState("oauth");
   const [skillsOnly, setSkillsOnly] = useState(plugin.kind === "skills");
-  const formRef = useRef<HTMLFormElement>(null);
-  const nameRef = useRef<HTMLInputElement>(null);
-  useEffect(() => {
-    if (busy) return;
-    // The settings page scrolls inside <main>. Autofocus alone can leave the
-    // newly inserted form above that container's viewport after layout changes.
-    formRef.current?.scrollIntoView?.({ block: "start", behavior: "instant" });
-    nameRef.current?.focus({ preventScroll: true });
-  }, [busy]);
   return (
     <form
-      ref={formRef}
-      className="scroll-mt-4 space-y-3 rounded-lg border bg-muted/30 p-4"
+      className="space-y-3"
       onSubmit={(e) => {
         e.preventDefault();
         void submit({
@@ -341,8 +346,8 @@ function AccountForm({
         });
       }}
     >
-      <h3 className="text-sm font-semibold">Set up {plugin.name}</h3>
-      <p className="text-xs text-muted-foreground">{plugin.setup}</p>
+      <DialogTitle>Set up {plugin.name}</DialogTitle>
+      <DialogDescription>{plugin.setup}</DialogDescription>
       {plugin.docs_url && (
         <a
           className="text-xs underline"
@@ -356,7 +361,7 @@ function AccountForm({
       <label className="block space-y-1 text-xs">
         Account name
         <Input
-          ref={nameRef}
+          autoFocus
           value={label}
           maxLength={200}
           onChange={(e) => setLabel(e.target.value)}

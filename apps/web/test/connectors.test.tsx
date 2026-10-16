@@ -33,7 +33,7 @@ const account: ConnectorAccount = {
     { name: "write_sheet", inputSchema: { type: "object" } },
   ],
 };
-function fixture(accounts: ConnectorAccount[] = []) {
+function fixture(accounts: ConnectorAccount[] = [], installed = false) {
   const writes: { url: string; body: unknown; method: string }[] = [];
   vi.stubGlobal(
     "fetch",
@@ -49,7 +49,7 @@ function fixture(accounts: ConnectorAccount[] = []) {
       let value: unknown = {};
       if (url === "/api/connectors")
         value = {
-          plugins: CONNECTOR_CATALOG.map((p) => ({ ...p, installed: false })),
+          plugins: CONNECTOR_CATALOG.map((p) => ({ ...p, installed })),
           accounts,
           oauth_configured: true,
           bridge_configured: true,
@@ -72,28 +72,32 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("connector Settings", () => {
-  it("brings setup into view and focuses it after installation finishes, including reopening", async () => {
-    fixture();
-    const scrollIntoView = vi.fn();
-    const original = HTMLElement.prototype.scrollIntoView;
-    HTMLElement.prototype.scrollIntoView = scrollIntoView;
-    try {
+  it.each([false, true])(
+    "opens setup immediately without a network write and can be reopened (installed=%s)",
+    async (installed) => {
+      const writes = fixture([], installed);
       render(<Connectors />);
-      const card = (await screen.findByRole("heading", { name: "Google Sheets" })).closest("article")!;
+      const card = (
+        await screen.findByRole("heading", { name: "Google Sheets" })
+      ).closest("article")!;
       for (let attempt = 0; attempt < 2; attempt++) {
-        scrollIntoView.mockClear();
-        await userEvent.click(within(card).getByRole("button", { name: "Set up" }));
-        await waitFor(() => {
-          expect(scrollIntoView).toHaveBeenCalledWith({ block: "start", behavior: "instant" });
-          expect(document.activeElement).toBe(screen.getByLabelText("Account name"));
-          expect((screen.getByRole("button", { name: "Save account" }) as HTMLButtonElement).disabled).toBe(false);
+        await userEvent.click(
+          within(card).getByRole("button", {
+            name: installed ? "Add account" : "Set up",
+          }),
+        );
+        const dialog = await screen.findByRole("dialog", {
+          name: "Set up Google Sheets",
         });
-        await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+        expect(within(dialog).getByLabelText("MCP endpoint")).toBeTruthy();
+        expect(writes).toHaveLength(0);
+        await userEvent.click(
+          within(dialog).getByRole("button", { name: "Cancel" }),
+        );
+        await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
       }
-    } finally {
-      HTMLElement.prototype.scrollIntoView = original;
-    }
-  });
+    },
+  );
   it("lists all 14 plugins, distinguishes Skills and records explicit account setup", async () => {
     const writes = fixture();
     render(<Connectors />);
