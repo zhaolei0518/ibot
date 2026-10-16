@@ -13,3 +13,5 @@ export * from "./states.js";
 export * from "./support.js";
 export * from "./labels.js";
 export * from "./tools.js";
+export * from "./connectors.js";
+export * from "./connector-sources.js";

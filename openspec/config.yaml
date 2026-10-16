@@ -1,0 +1,8 @@
+schema: spec-driven
+context: |
+  invisible_dots TypeScript monorepo: Fastify control plane, PGlite/PostgreSQL,
+  Next.js/React UI, Python engine in per-Bot Linux VMs.
+  Preserve existing manual MCP configs and private model gateway support.
+  Use conventional commits. Never store credentials in source or expose them to the browser.
+  Deployment uses the existing zhaoleilei1 OS account; create no OS users or home directories.
+  Keep provider availability, marketplace provenance and account authorization separate.

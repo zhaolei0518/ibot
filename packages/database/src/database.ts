@@ -1,4 +1,5 @@
 import { ENV, hostPaths } from "@invisible-dots/shared";
+import { ConnectorsRepository } from "./connectors.js";
 import { ApprovalsRepository } from "./approvals.js";
 import { ChannelsRepository } from "./channels.js";
 import { ComputersRepository } from "./computers.js";
@@ -26,6 +27,7 @@ export class Repositories {
   readonly approvals: ApprovalsRepository;
   readonly secrets: SecretsRepository;
   readonly channels: ChannelsRepository;
+  readonly connectors: ConnectorsRepository;
 
   constructor(q: Queryable, box: SecretBox) {
     this.dots = new DotsRepository(q);
@@ -36,6 +38,7 @@ export class Repositories {
     this.approvals = new ApprovalsRepository(q);
     this.secrets = new SecretsRepository(q, box);
     this.channels = new ChannelsRepository(q);
+    this.connectors = new ConnectorsRepository(q, box);
   }
 }
 

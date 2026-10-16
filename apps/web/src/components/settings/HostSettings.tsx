@@ -1,5 +1,6 @@
 "use client";
 
+import { Connectors } from "./Connectors";
 import { aboutRows } from "../../lib/host-settings";
 import { isReady, notReadyCount } from "../../lib/preflight";
 import type { ThemePreference } from "../../lib/theme";
@@ -29,6 +30,7 @@ export function HostSettings() {
       <Section id="key" title="Model credentials" description="Default key for CPA, OpenRouter, or another compatible gateway. Dots with their own key keep using it; other running Dots receive the new default.">
         <KeyForm />
       </Section>
+      <Connectors />
       <Appearance />
       <About />
     </div>

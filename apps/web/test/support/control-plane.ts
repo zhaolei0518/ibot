@@ -1,3 +1,4 @@
+import { CONNECTOR_CATALOG } from "@invisible-dots/shared/browser";
 /**
  * A stand-in for the control plane as the browser sees it: the routes the shell reads and the computer actions it
  * sends, answered from memory, and `/api/stream` as a live SSE body the test pushes events into. `install()` puts
@@ -306,6 +307,8 @@ export class FakeControlPlane {
       if (this.failDoctor) return json({ error: "broken", message: "the doctor could not run" }, this.failDoctor);
       return json({ ok: this.doctor.every((check) => check.status === "ok"), checks: this.doctor });
     }
+    if (pathname === "/api/connectors" && method === "GET") return json({plugins:CONNECTOR_CATALOG.map(p=>({...p,installed:false})),accounts:[],oauth_configured:false,bridge_configured:false});
+    if (/^\/api\/dots\/[^/]+\/connectors$/.test(pathname) && method === "GET") return json({bindings:[]});
     if (pathname === "/api/health") {
       return this.healthy
         ? json({

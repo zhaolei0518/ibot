@@ -23,3 +23,4 @@ export { DEFAULT_POOL_SIZE, PostgresDb, redactDatabaseUrl } from "./postgres.js"
 export { isUniqueViolation } from "./rows.js";
 export * from "./secrets.js";
 export * from "./tasks.js";
+export * from "./connectors.js";

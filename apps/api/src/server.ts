@@ -1,3 +1,5 @@
+import { ConnectorManager, type ConnectorOptions } from "./connectors/manager.js";
+import { connectorRoutes } from "./connectors/routes.js";
 /**
  * The control-plane HTTP API of architecture section 9.6. Every route needs
  * the bearer token; every error is `{ error, message }`. The handlers are
@@ -39,6 +41,8 @@ export const SSE_HEARTBEAT_MS = 15_000;
 
 export interface ServerOptions {
   scheduler: Scheduler;
+  connectors?: ConnectorManager;
+  connectorOptions?: ConnectorOptions;
   channels: ChannelHub;
   /** Runs the host checks of architecture section 11.1 on the machine this server runs on; `startServer` binds the real ones. */
   doctor(): Promise<DoctorCheck[]>;
@@ -188,6 +192,8 @@ export function buildServer(options: ServerOptions): FastifyInstance {
     });
     return doctorRun;
   });
+
+  connectorRoutes(app, options.connectors ?? new ConnectorManager(scheduler, options.connectorOptions));
 
   // Dots
 

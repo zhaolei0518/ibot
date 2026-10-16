@@ -17,7 +17,7 @@ export function Section({
   children: ReactNode;
 }) {
   return (
-    <section aria-labelledby={`${id}-title`} aria-busy={busy} className="space-y-3 rounded-lg border bg-card p-4">
+    <section id={id} aria-labelledby={`${id}-title`} aria-busy={busy} className="space-y-3 rounded-lg border bg-card p-4">
       <div className="flex items-center justify-between gap-2">
         <h2 id={`${id}-title`} className="text-sm font-semibold">
           {title}

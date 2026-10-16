@@ -1,3 +1,5 @@
+import { ConnectorManager } from "./connectors/manager.js";
+import { buildConnectorBridge } from "./connectors/bridge.js";
 /**
  * The control plane as one process (architecture section 2): the database,
  * the vm-manager, the scheduler and the HTTP API, composed in the order a
@@ -149,7 +151,16 @@ export async function startServer(options: StartServerOptions = {}): Promise<Run
       ...options.doctor,
     };
     const facts: HostFacts = { database_kind: db.kind, data_dir: paths.home, logs_dir: paths.logsDir };
-    const app = buildServer({ scheduler, channels, doctor: () => runDoctor(doctorDeps), host: facts, token: token.value, logger });
+    const connectorListen = env.INVISIBLE_DOTS_CONNECTOR_BRIDGE_LISTEN;
+    const connectors = new ConnectorManager(scheduler, { publicUrl: env.INVISIBLE_DOTS_PUBLIC_URL, bridgeUrl: connectorListen ? env.INVISIBLE_DOTS_CONNECTOR_BRIDGE_URL : undefined });
+    if (connectorListen) {
+      if (!env.INVISIBLE_DOTS_CONNECTOR_BRIDGE_URL) throw new Error("Set INVISIBLE_DOTS_CONNECTOR_BRIDGE_URL to the bridge URL reachable from Bot VMs.");
+      const address = parseListen(connectorListen);
+      const bridge = buildConnectorBridge(connectors);
+      cleanup.push(() => bridge.close());
+      await bridge.listen({ host: address.host, port: address.port });
+    }
+    const app = buildServer({ scheduler, channels, connectors, doctor: () => runDoctor(doctorDeps), host: facts, token: token.value, logger });
     cleanup.push(() => app.close());
 
     await scheduler.start();

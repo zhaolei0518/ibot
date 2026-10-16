@@ -62,6 +62,7 @@ describe.each(testAdapters())("repositories on %s", { timeout: SETUP_TIMEOUT }, 
       "0012_dot_has_no_context_tokens",
       "0013_approval_used",
       "0014_states_that_exist",
+      "0015_global_connectors",
     ]);
   });
 

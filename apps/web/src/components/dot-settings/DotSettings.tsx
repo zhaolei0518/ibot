@@ -22,6 +22,7 @@ import { McpServersPanel } from "./mcp-servers-panel";
 import { PermissionsPanel } from "./permissions-panel";
 import { ReviewDialog } from "./review-dialog";
 import { useToolTable } from "./tool-table";
+import { DotConnectors } from "./connectors-panel";
 import { VmProxy } from "./vm-proxy";
 
 type Mode = "form" | "yaml";
@@ -164,6 +165,7 @@ function Editor({
           <GeneralPanel {...panel} />
           <ModelPanel {...panel} />
           <PermissionsPanel {...panel} computerState={computerState} table={table} />
+          <DotConnectors dotId={dotId} reload={reload} />
           <McpServersPanel {...panel} dotId={dotId} computerState={computerState} table={table} />
           <ComputerPanel {...panel} />
           <LimitsPanel {...panel} />

@@ -1,0 +1,67 @@
+{
+  "checked_on": "2026-10-16",
+  "method": "loadConnectorResources against pinned public sources",
+  "results": [
+    {
+      "id": "cloudflare",
+      "ref": "41e0d19858946d18af9ee2c2feebbe2e11d829ff",
+      "skills": 16,
+      "servers": [
+        {
+          "name": "cloudflare",
+          "url": "https://mcp.cloudflare.com/mcp"
+        }
+      ]
+    },
+    {
+      "id": "vercel",
+      "ref": "3b472643cbb1a42479d99b0c9a1d27b8bc84aaa7",
+      "skills": 33,
+      "servers": [
+        {
+          "name": "vercel",
+          "url": "https://mcp.vercel.com/"
+        }
+      ]
+    },
+    {
+      "id": "gitlab",
+      "ref": "e89ebfc384db30e3d06c840853ad67d22f5f9c94",
+      "skills": 1,
+      "servers": [
+        {
+          "name": "GitLab",
+          "url": "https://gitlab.com/api/v4/mcp"
+        }
+      ]
+    },
+    {
+      "id": "notion",
+      "ref": "cf1324609edba6d617164f1dec138aeb43f26735",
+      "skills": 14,
+      "servers": [
+        {
+          "name": "notion",
+          "url": "https://mcp.notion.com/mcp"
+        }
+      ]
+    },
+    {
+      "id": "firecrawl",
+      "ref": "866f30d4dc0b3eca6a05884f6b6db6d914a5967c",
+      "skills": 10,
+      "servers": []
+    },
+    {
+      "id": "gitbook",
+      "ref": "3cf296758fecb5ece7e720ff7f20b0da1f1b5101",
+      "skills": 6,
+      "servers": [
+        {
+          "name": "gitbook",
+          "url": "https://mcp.gitbook.com/mcp"
+        }
+      ]
+    }
+  ]
+}

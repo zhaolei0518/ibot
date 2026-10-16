@@ -8,3 +8,5 @@ export * from "./stderr-logger.js";
 export * from "./process.js";
 export * from "./run-process.js";
 export * from "./replace-file.js";
+export * from "./connectors.js";
+export * from "./connector-sources.js";

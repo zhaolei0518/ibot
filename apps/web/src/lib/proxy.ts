@@ -142,6 +142,7 @@ const FORWARDED_RESPONSE_HEADERS = [
   // A Dot's file is served under these (apps/api/src/file-types.ts); dropped here, the browser would sniff it and run it.
   "x-content-type-options",
   "content-security-policy",
+  "referrer-policy",
 ];
 
 export function forwardRequestHeaders(incoming: Headers, token: string): Headers {
