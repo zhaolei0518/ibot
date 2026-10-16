@@ -11,3 +11,7 @@
 ## Deployment acceptance
 
 Code `1872d06` deployed to 10.41.82.104:3000 using the existing zhaoleilei1 account. Protected database/config backup taken before migration. API health, 14 catalogue entries, six real resource imports and loopback bridge listener verified. The existing my Bot's guest connected to the bridge via 10.0.2.2 and successfully read the imported Firecrawl skill. Its model response returned through the existing private gateway. OAuth remains unconfigured; actual external provider account acceptance remains pending. See docs/connectors/README.md for exact paths and rollback constraints.
+
+## Setup visibility regression
+
+Google Sheets setup was inserted above the catalogue inside the Settings scroll container. Input autofocus did not reliably bring the form into view after the install/reload layout update. Setup now explicitly scrolls the form into view and focuses the account name after the operation finishes, including reopening. Connector UI regression: 5 tests passed; all project typechecks passed. This change does not configure Google OAuth or provision a Workspace MCP endpoint.

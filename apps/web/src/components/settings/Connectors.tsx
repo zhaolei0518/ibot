@@ -1,5 +1,5 @@
 "use client";
-import { useCallback, useEffect, useState, type FormEvent } from "react";
+import { useCallback, useEffect, useRef, useState, type FormEvent } from "react";
 import {
   ArrowUpRightIcon,
   CheckIcon,
@@ -317,9 +317,19 @@ function AccountForm({
   const [endpoint, setEndpoint] = useState(plugin.endpoint ?? "");
   const [mode, setMode] = useState("oauth");
   const [skillsOnly, setSkillsOnly] = useState(plugin.kind === "skills");
+  const formRef = useRef<HTMLFormElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (busy) return;
+    // The settings page scrolls inside <main>. Autofocus alone can leave the
+    // newly inserted form above that container's viewport after layout changes.
+    formRef.current?.scrollIntoView?.({ block: "start", behavior: "instant" });
+    nameRef.current?.focus({ preventScroll: true });
+  }, [busy]);
   return (
     <form
-      className="space-y-3 rounded-lg border bg-muted/30 p-4"
+      ref={formRef}
+      className="scroll-mt-4 space-y-3 rounded-lg border bg-muted/30 p-4"
       onSubmit={(e) => {
         e.preventDefault();
         void submit({
@@ -346,7 +356,7 @@ function AccountForm({
       <label className="block space-y-1 text-xs">
         Account name
         <Input
-          autoFocus
+          ref={nameRef}
           value={label}
           maxLength={200}
           onChange={(e) => setLabel(e.target.value)}

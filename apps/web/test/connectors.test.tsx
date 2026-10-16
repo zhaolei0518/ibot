@@ -72,6 +72,28 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 describe("connector Settings", () => {
+  it("brings setup into view and focuses it after installation finishes, including reopening", async () => {
+    fixture();
+    const scrollIntoView = vi.fn();
+    const original = HTMLElement.prototype.scrollIntoView;
+    HTMLElement.prototype.scrollIntoView = scrollIntoView;
+    try {
+      render(<Connectors />);
+      const card = (await screen.findByRole("heading", { name: "Google Sheets" })).closest("article")!;
+      for (let attempt = 0; attempt < 2; attempt++) {
+        scrollIntoView.mockClear();
+        await userEvent.click(within(card).getByRole("button", { name: "Set up" }));
+        await waitFor(() => {
+          expect(scrollIntoView).toHaveBeenCalledWith({ block: "start", behavior: "instant" });
+          expect(document.activeElement).toBe(screen.getByLabelText("Account name"));
+          expect((screen.getByRole("button", { name: "Save account" }) as HTMLButtonElement).disabled).toBe(false);
+        });
+        await userEvent.click(screen.getByRole("button", { name: "Cancel" }));
+      }
+    } finally {
+      HTMLElement.prototype.scrollIntoView = original;
+    }
+  });
   it("lists all 14 plugins, distinguishes Skills and records explicit account setup", async () => {
     const writes = fixture();
     render(<Connectors />);
