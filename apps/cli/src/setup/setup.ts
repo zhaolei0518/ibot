@@ -1,7 +1,7 @@
 /**
  * `invisible-dots setup` (architecture section 11.2): run doctor, install
  * only what is missing for QEMU and its accelerator, then check again. The
- * rest of doctor's list (images, the web client, the OpenRouter key) has its own commands,
+ * rest of doctor's list (images, the web client, the Model API key) has its own commands,
  * which setup names at the end instead of running.
  */
 import type { DoctorCheck, DoctorCheckId } from "@invisible-dots/shared";

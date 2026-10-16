@@ -277,12 +277,23 @@ export const dotConfigSchema = z
       .string()
       .regex(DOT_NAME_PATTERN, "name must be 1 to 40 characters of lowercase letters, digits and '-'"),
     instructions: z.string().optional(),
-    model: z
-      .object({
-        provider: z.literal("openrouter", { error: 'model.provider must be "openrouter"' }),
+    model: z.discriminatedUnion("provider", [
+      z.object({ provider: z.literal("openrouter"), id: modelId }).strict(),
+      z.object({
+        provider: z.literal("openai_compatible"),
         id: modelId,
-      })
-      .strict(),
+        base_url: z.string().url().refine((value) => {
+          const url = new URL(value);
+          return ["http:", "https:"].includes(url.protocol) && !url.username && !url.password && !url.search && !url.hash;
+        }, "base_url must be an HTTP(S) URL without credentials, query or fragment"),
+        context_tokens: z.number().int().positive(),
+        max_output_tokens: z.number().int().positive(),
+        input_cost_per_million: z.number().finite().nonnegative(),
+        output_cost_per_million: z.number().finite().nonnegative(),
+      }).strict().refine((model) => model.max_output_tokens < model.context_tokens, {
+        path: ["max_output_tokens"], message: "max_output_tokens must be less than context_tokens",
+      }),
+    ]),
     models: z
       .record(z.string(), modelId)
       .default({})
@@ -338,6 +349,11 @@ export const dotConfigSchema = z
   })
   .strict()
   .superRefine((config, ctx) => {
+    if (config.model.provider === "openai_compatible") {
+      for (const [role, id] of Object.entries(config.models)) {
+        if (id !== config.model.id) ctx.addIssue({ code: "custom", path: ["models", role], message: "openai_compatible roles must use model.id (shared limits and rates)" });
+      }
+    }
     // A typo such as "computer.exe: deny" would otherwise be silently ignored and leave the real permission at its
     // default, and the permission of a server the config does not declare would hold for nothing.
     for (const key of Object.keys(config.permissions)) {

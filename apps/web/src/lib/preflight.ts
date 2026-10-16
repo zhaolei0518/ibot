@@ -1,6 +1,6 @@
 /**
  * What the create form checks before a Dot is made: that the control plane answers, that its database does and that
- * an OpenRouter key is stored (`GET /api/health`), and then what the host needs for a Dot's computer to run, which is
+ * a model API key is stored (`GET /api/health`), and then what the host needs for a Dot's computer to run, which is
  * the report of `invisible-dots doctor` (`GET /api/doctor`: QEMU, the accelerator, disk, the images). The list is the
  * one the panel draws, item by item.
  *
@@ -36,7 +36,7 @@ function controlPlaneItems(result: HealthResult): PreflightItem[] {
     return [
       { id: "api", label: "Control plane", state: "failed", detail: result.error },
       { id: "database", label: "Database", state: "unknown", detail: NOT_CHECKED_NO_ANSWER },
-      { id: "key", label: "OpenRouter key", state: "unknown", detail: NOT_CHECKED_NO_ANSWER },
+      { id: "key", label: "Model API key", state: "unknown", detail: NOT_CHECKED_NO_ANSWER },
     ];
   }
   const { health } = result;
@@ -50,7 +50,7 @@ function controlPlaneItems(result: HealthResult): PreflightItem[] {
     },
     {
       id: "key",
-      label: "OpenRouter key",
+      label: "Model API key",
       state: health.openrouter_configured ? "ok" : "failed",
       detail: health.openrouter_configured ? "Stored." : "None stored. The Dot's computer cannot answer until one is.",
     },

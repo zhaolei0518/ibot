@@ -1,4 +1,4 @@
-"""The Dot's one model provider: OpenRouter, with the key the host pushed to memory.
+"""The Dot's model provider: OpenRouter or a configured gateway, with the key the host pushed to memory.
 
 A provider object holds its key, so a new one is built only when the key, the
 model or the base URL changes. A turn captures its provider (and the model it was
@@ -14,22 +14,29 @@ from nanobot.providers.registry import OPENROUTER
 
 
 class OpenRouterProviders:
-    """Hands out the OpenRouter provider for the current key and settings."""
+    """Hands out the configured provider for the current key and settings."""
 
     def __init__(self) -> None:
-        self._identity: tuple[str, str, str | None] | None = None
+        self._identity: tuple | None = None
         self._provider: OpenAICompatProvider | None = None
 
     def current(self, settings: EngineSettings, key: str) -> OpenAICompatProvider:
         """The provider for `key`, the model and the base URL of `settings`; the same object while they hold."""
-        identity = (key, settings.model_id, settings.openrouter_base_url)
+        identity = (key, settings.model_id, settings.openrouter_base_url, settings.provider, settings.compatible)
         if self._provider is None or identity != self._identity:
-            self._provider = OpenAICompatProvider(
-                api_key=key,
-                api_base=settings.openrouter_base_url,
-                default_model=settings.model_id,
-                spec=OPENROUTER,
-                provider_name=OPENROUTER.name,
-            )
+            self._provider = self._build(settings, key)
             self._identity = identity
         return self._provider
+
+    @staticmethod
+    def _build(settings: EngineSettings, key: str) -> OpenAICompatProvider:
+        if settings.compatible is not None:
+            from nanobot.providers.configured_provider import ConfiguredProvider
+            return ConfiguredProvider(key, settings.model_id, settings.compatible)
+        return OpenAICompatProvider(
+            api_key=key,
+            api_base=settings.openrouter_base_url,
+            default_model=settings.model_id,
+            spec=OPENROUTER,
+            provider_name=OPENROUTER.name,
+        )

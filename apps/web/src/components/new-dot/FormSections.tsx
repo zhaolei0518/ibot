@@ -71,8 +71,8 @@ export function IdentitySection({ form, change, errorOf, touch }: SectionProps) 
 
 export function BrainSection({ form, change, errorOf, touch }: SectionProps) {
   return (
-    <Section number={2} title="Brain" description="The models that do its thinking, through OpenRouter.">
-      <Field id="dot-model" label="Model" hint="An OpenRouter model id. Pick a suggestion or type any other." error={errorOf("modelId")}>
+    <Section number={2} title="Brain" description="The models that do its thinking. New Dots use the configured private model gateway.">
+      <Field id="dot-model" label="Model" hint="The model ID exposed by your configured gateway." error={errorOf("modelId")}>
         {(control) => (
           <Input {...control} list="dot-model-suggestions" value={form.modelId} autoComplete="off" spellCheck={false} onChange={(event) => change({ modelId: event.target.value })} onBlur={() => touch("modelId")} />
         )}
@@ -81,7 +81,7 @@ export function BrainSection({ form, change, errorOf, touch }: SectionProps) {
         id="dot-summary-model"
         label="Summary model"
         optional
-        hint="Writes the summary when a conversation grows past what fits. Left empty, the Dot's own model does."
+        hint="Writes the summary when a conversation grows past what fits. Leave empty to use the same model; private gateways currently require the same model ID."
         error={errorOf("summaryModelId")}
       >
         {(control) => (

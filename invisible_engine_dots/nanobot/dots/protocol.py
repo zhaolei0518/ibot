@@ -261,14 +261,16 @@ def _describe_issues(error: ValidationError, *, tagged: bool) -> str:
     for issue in error.errors(include_url=False, include_input=False):
         loc = tuple(str(part) for part in issue["loc"])
         if issue["type"] == "union_tag_invalid":
-            loc, message = ("type",), "unknown event type"
+            loc, message = (("type",), "unknown event type") if tagged else (loc + ("provider",), "unknown model provider")
         elif issue["type"] == "union_tag_not_found":
-            loc, message = ("type",), "Field required"
+            loc, message = (("type",), "Field required") if tagged else (loc + ("provider",), "Field required")
         else:
             # A validator's own text, without pydantic's "Value error, " in front of it.
             message = issue["msg"].removeprefix("Value error, ")
             if tagged and loc and loc[0] in INBOUND_EVENT_TYPES:
                 loc = loc[1:]
+        if not tagged and len(loc) >= 2 and loc[0] == "model" and loc[1] in ("openrouter", "openai_compatible"):
+            loc = loc[:1] + loc[2:]
         problems.append(f"{'.'.join(loc) or '<root>'}: {message}")
     return "; ".join(problems)
 
@@ -287,9 +289,32 @@ class _Open(BaseModel):
     model_config = ConfigDict(extra="allow")
 
 
-class ModelConfig(_Open):
+class OpenRouterModelConfig(_Open):
     provider: Literal["openrouter"]
     id: NonEmptyStr
+
+
+class CompatibleModelConfig(_Open):
+    provider: Literal["openai_compatible"]
+    id: NonEmptyStr
+    base_url: NonEmptyStr
+    context_tokens: PositiveInt
+    max_output_tokens: PositiveInt
+    input_cost_per_million: Annotated[float, Field(ge=0, allow_inf_nan=False)]
+    output_cost_per_million: Annotated[float, Field(ge=0, allow_inf_nan=False)]
+
+    @model_validator(mode="after")
+    def _compatible_settings(self) -> CompatibleModelConfig:
+        from urllib.parse import urlsplit
+        url = urlsplit(self.base_url)
+        if url.scheme not in ("http", "https") or not url.hostname or url.username or url.password or url.query or url.fragment:
+            raise ValueError("base_url must be an HTTP(S) URL without credentials, query or fragment")
+        if self.max_output_tokens >= self.context_tokens:
+            raise ValueError("max_output_tokens must be less than context_tokens")
+        return self
+
+
+ModelConfig = Annotated[OpenRouterModelConfig | CompatibleModelConfig, Field(discriminator="provider")]
 
 
 class LimitsConfig(_Open):
@@ -360,6 +385,8 @@ class DotRuntimeConfig(_Open):
 
     @model_validator(mode="after")
     def _server_permissions_are_of_declared_servers(self) -> DotRuntimeConfig:
+        if self.model.provider == "openai_compatible" and any(id != self.model.id for id in (self.models or {}).values()):
+            raise ValueError("openai_compatible roles must use model.id (shared limits and rates)")
         for permission in self.permissions:
             # A server's name has no `.`, so `mcp.servers.add` (adding one) is never a server's permission.
             server = permission[len("mcp.") :] if permission.startswith("mcp.") else None

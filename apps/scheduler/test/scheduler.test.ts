@@ -845,13 +845,13 @@ describe.each(testAdapters())("Scheduler with a fake driver and a fake guest (%s
     expect("origin" in message!).toBe(false);
   });
 
-  it("READY fails without an OpenRouter key and succeeds once one is set", async () => {
+  it("READY fails without a model API key and succeeds once one is set", async () => {
     await db.secrets.delete("global", "openrouter_api_key");
     try {
       const { scheduler } = make();
       const dot = await scheduler.createDot(yaml("keyless"));
       await waitFor(async () => (await db.dots.get(dot.id))?.status === "ERROR", "ERROR");
-      expect((await db.dots.get(dot.id))?.error).toMatch(/no OpenRouter API key/);
+      expect((await db.dots.get(dot.id))?.error).toMatch(/no model API key/);
       expect((await db.computers.get(dot.id))?.state).toBe("ERROR");
       await scheduler.setOpenRouterKey("sk-or-new", dot.id);
       await waitFor(async () => (await db.dots.get(dot.id))?.status === "READY", "READY after key");
@@ -1405,7 +1405,7 @@ describe.each(testAdapters())("Scheduler with a fake driver and a fake guest (%s
     await expect(scheduler.listSkills(dot.id)).rejects.toMatchObject({ status: 409, code: "computer_stopped" });
   });
 
-  it("delete removes the Dot's own OpenRouter key and keeps the global one", async () => {
+  it("delete removes the Dot's own Model API key and keeps the global one", async () => {
     const { scheduler } = make();
     const dot = await readyDot(scheduler, "keyed");
     await scheduler.setOpenRouterKey("sk-or-own", dot.id);

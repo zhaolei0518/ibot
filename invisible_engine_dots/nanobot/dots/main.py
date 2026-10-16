@@ -166,12 +166,24 @@ async def serve(environment: Environment, stop: asyncio.Event) -> None:
         )
         cron.on_job = engine.automation_fired
         cron.on_next_wake = engine.automations_next_run
-        checks = create_guest_checks(
-            writable_dir=state_dir,
-            browser_command=environment.mcp_command,
-            network_target=environment.network_check,
-            path=environment.path,
-        )
+        check_target = None
+        check_runner = None
+
+        async def checks():
+            nonlocal check_target, check_runner
+            from urllib.parse import urlsplit
+            target = environment.network_check
+            config = engine.config
+            if config is not None and config.model.provider == "openai_compatible":
+                url = urlsplit(config.model.base_url)
+                target = f"{url.hostname}:{url.port or (443 if url.scheme == 'https' else 80)}"
+            if check_runner is None or target != check_target:
+                check_target = target
+                check_runner = create_guest_checks(
+                    writable_dir=state_dir, browser_command=environment.mcp_command,
+                    network_target=target, path=environment.path,
+                )
+            return await check_runner()
         server = AgentServer(
             engine=engine,
             key_holder=key_holder,

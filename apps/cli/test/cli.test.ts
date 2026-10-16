@@ -491,7 +491,7 @@ describe("commands", () => {
       stdin: "never read: a terminal does not end",
     });
     expect(typed.code).toBe(EXIT.ok);
-    expect(typed.stderr).toBe("paste the OpenRouter API key, then press Enter:\n");
+    expect(typed.stderr).toBe("paste the Model API key, then press Enter:\n");
     expect(typed.stderr).not.toMatch(/Ctrl/);
     expect(requests.at(-1)?.body).toEqual({ value: "sk-or-v1-typed" });
     const empty = await cli(["secret", "openrouter"], { tty: true, line: "" });

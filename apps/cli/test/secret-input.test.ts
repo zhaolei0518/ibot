@@ -1,5 +1,5 @@
 /**
- * The line a person pastes at a prompt (an OpenRouter key, a bot token) is read with the echo off. The tests play the
+ * The line a person pastes at a prompt (a model API key, a bot token) is read with the echo off. The tests play the
  * terminal: a stream that says it is a TTY, takes raw mode and records what is written to the screen.
  */
 import { createInterface } from "node:readline";

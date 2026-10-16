@@ -316,7 +316,7 @@ describe.each(testAdapters())("delivery to guests (%s)", (kind) => {
     const dotRow = await db.dots.get(dot.id);
     const computer = await db.computers.get(dot.id);
     const events = await db.events.list({ dotId: dot.id });
-    expect(dotRow?.error).toMatch(/did not take the OpenRouter key and the MCP secrets \(status 502\)/);
+    expect(dotRow?.error).toMatch(/did not take the Model API key and the MCP secrets \(status 502\)/);
     for (const text of [dotRow?.error ?? "", computer?.last_error ?? "", JSON.stringify(events), lines.join("\n")]) {
       expect(text).not.toContain(KEY);
       expect(text).not.toContain(KEY.slice(0, 12));

@@ -255,7 +255,7 @@ export interface HealthResponse extends HostFacts {
   status: "ok";
   database: "ok";
   version: string;
-  /** Whether a global OpenRouter key is stored; `invisible-dots doctor` reports it (section 11.1). */
+  /** Whether a global Model API key is stored; `invisible-dots doctor` reports it (section 11.1). */
   openrouter_configured: boolean;
 }
 

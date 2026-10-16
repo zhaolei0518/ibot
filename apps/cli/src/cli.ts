@@ -120,7 +120,7 @@ Using the server:
                                                 --always also allows that permission for the Dot from now on
   invisible-dots reject <approval-id> [--note text]
   invisible-dots secret openrouter [--dot <dot>]
-                                                store the OpenRouter key: asked for in a terminal, read from stdin when piped (never from arguments)
+                                                store the Model API key: asked for in a terminal, read from stdin when piped (never from arguments)
   invisible-dots secret proxy --dot <dot> [--clear]
                                                 set the Dot's VM proxy (socks5://user:pass@host:port), used from its next start; asked for like the key; --clear removes it
   invisible-dots secret mcp --dot <dot> <server> <name> [--clear]
@@ -599,11 +599,11 @@ export async function run(argv: string[], io: CliIo): Promise<number> {
         if (args.length > 1) {
           throw new UsageError("the key is read from stdin, never from arguments (they end up in shell history and ps)");
         }
-        const key = await secretFromInput(io, { prompt: "OpenRouter API key", noun: "key", command: STORE_OPENROUTER_KEY });
+        const key = await secretFromInput(io, { prompt: "Model API key", noun: "key", command: STORE_OPENROUTER_KEY });
         const result = await (await api()).setOpenRouterKey(key, values.dot);
         out(
           result,
-          `OpenRouter key stored ${values.dot ? `for Dot ${values.dot}` : "for every Dot"}; pushed to ${result.pushed} running Dot${result.pushed === 1 ? "" : "s"}\n`,
+          `Model API key stored ${values.dot ? `for Dot ${values.dot}` : "for every Dot"}; pushed to ${result.pushed} running Dot${result.pushed === 1 ? "" : "s"}\n`,
         );
         return EXIT.ok;
       }

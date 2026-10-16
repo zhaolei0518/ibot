@@ -108,9 +108,9 @@ describe("Home", () => {
     const checklist = await screen.findByRole("region", { name: "Get this computer ready" });
     expect(within(checklist).getByText(/2 things need attention/)).toBeTruthy();
     expect(within(checklist).getByText("invisible-dots image build")).toBeTruthy();
-    expect(within(checklist).getAllByRole("listitem").some((item) => item.textContent?.startsWith("OpenRouter key: Needs attention"))).toBe(true);
+    expect(within(checklist).getAllByRole("listitem").some((item) => item.textContent?.startsWith("Model API key: Needs attention"))).toBe(true);
     // The key is entered here, and the first Dot can be created at once: the checklist informs, it does not block.
-    expect(within(checklist).getByLabelText("OpenRouter API key")).toBeTruthy();
+    expect(within(checklist).getByLabelText("Model API key")).toBeTruthy();
     expect(screen.getByRole("link", { name: "Create your first Dot" }).getAttribute("href")).toBe("/new");
   });
 
@@ -119,7 +119,7 @@ describe("Home", () => {
     plane.keyPushedTo = 1;
     await renderHome();
     const checklist = await screen.findByRole("region", { name: "Get this computer ready" });
-    await userEvent.type(within(checklist).getByLabelText("OpenRouter API key"), "sk-or-onboarding");
+    await userEvent.type(within(checklist).getByLabelText("Model API key"), "sk-or-onboarding");
     await userEvent.click(within(checklist).getByRole("button", { name: "Save key" }));
     expect(await within(checklist).findByText("Saved. Pushed to 1 running Dot.")).toBeTruthy();
     expect(plane.savedKeys).toEqual(["sk-or-onboarding"]);
@@ -132,7 +132,7 @@ describe("Home", () => {
     await renderHome();
     const checklist = await screen.findByRole("region", { name: "Get this computer ready" });
     expect(within(checklist).getByText(/1 thing needs attention/)).toBeTruthy();
-    expect(within(checklist).queryByLabelText("OpenRouter API key")).toBeNull();
+    expect(within(checklist).queryByLabelText("Model API key")).toBeNull();
     expect(within(checklist).queryByLabelText("Replace the key")).toBeNull();
   });
 

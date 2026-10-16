@@ -159,7 +159,7 @@ describe("doctor checks", () => {
     expect(find(results, "qemu").detail).toBe("qemu-system-x86_64 not found (the search failed: PATH unreadable)");
   });
 
-  it("has a web row, just before the OpenRouter key, only when the caller serves a web client", async () => {
+  it("has a web row, just before the Model API key, only when the caller serves a web client", async () => {
     const webBuild = async () => ({ entry: "/repo/apps/web/.next/standalone/apps/web/server.js", missing: undefined });
     const results = await runDoctor(healthyDoctor({ webBuild }).deps);
     expect(ids(results)).toEqual(["node", "qemu", "qemu-img", "accelerator", "accelerator-probe", "disk", "golden-image", "runtime-image", "web", "openrouter"]);
@@ -214,10 +214,10 @@ describe("doctor checks", () => {
   });
 
   it("answers the OpenRouter row from what the control plane knows", () => {
-    expect(openRouterCheck(true)).toEqual({ id: "openrouter", label: "OpenRouter key", status: "ok", detail: "stored" });
+    expect(openRouterCheck(true)).toEqual({ id: "openrouter", label: "Model API key", status: "ok", detail: "stored" });
     expect(openRouterCheck(false)).toEqual({
       id: "openrouter",
-      label: "OpenRouter key",
+      label: "Model API key",
       status: "missing",
       detail: "no key stored",
       fix: "invisible-dots secret openrouter",

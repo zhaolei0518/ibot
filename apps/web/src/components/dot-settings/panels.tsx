@@ -28,8 +28,8 @@ export function GeneralPanel({ draft, change, errorOf }: PanelProps) {
 
 export function ModelPanel({ draft, change, errorOf }: PanelProps) {
   return (
-    <Panel id="model" title="Model" description="The models that do its thinking, through OpenRouter.">
-      <Field id="set-model" label="Model" hint="Does all of the Dot's work. An OpenRouter model id: pick a suggestion or type any other." error={errorOf("model.id")}>
+    <Panel id="model" title="Model" description={draft.model.provider === "openai_compatible" ? "The models that do its thinking, through your configured gateway." : "The models that do its thinking, through OpenRouter."}>
+      <Field id="set-model" label="Model" hint={draft.model.provider === "openai_compatible" ? "The model ID served by your gateway. Role models share its configured limits and rates." : "Does all of the Dot's work. An OpenRouter model id: pick a suggestion or type any other."} error={errorOf("model.id")}>
         {(control) => <Input {...control} list="set-model-suggestions" value={draft.model.id} autoComplete="off" spellCheck={false} onChange={(event) => change(setField(draft, "model.id", event.target.value))} />}
       </Field>
       <Field

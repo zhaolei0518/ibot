@@ -12,7 +12,7 @@
  * It drives that release's scheduler, with a fake computer, through what a person's install holds: two
  * Dots (one stopped), a chat answered, a completed task, a task waiting for an approval, an approval
  * answered with "always", a cancelled task, an automation, a Telegram binding with its token, and the
- * OpenRouter key. The master key it writes is a test key: it only opens the secrets of the dump.
+ * Model API key. The master key it writes is a test key: it only opens the secrets of the dump.
  */
 import { randomBytes } from "node:crypto";
 import { writeFile } from "node:fs/promises";

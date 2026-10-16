@@ -83,7 +83,7 @@ describe("checkOpenRouterKey", () => {
     }
     for (const bad of ["SECRET\nTAIL", "SECRET TAIL", "SECRETüTAIL", "SECRET\u0000TAIL", "SECRET\tTAIL", "SECRET\u007fTAIL"]) {
       const checked = checkOpenRouterKey(bad);
-      expect(checked).toEqual({ ok: false, problem: `value is not an OpenRouter key: ${OPENROUTER_KEY_RULE}` });
+      expect(checked).toEqual({ ok: false, problem: `value is not a model API key: ${OPENROUTER_KEY_RULE}` });
       expect(JSON.stringify(checked)).not.toContain("SECRET");
     }
   });

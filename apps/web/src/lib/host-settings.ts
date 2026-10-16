@@ -4,7 +4,7 @@
  */
 import type { HealthResponse } from "@invisible-dots/sdk";
 
-/** What saving the OpenRouter key did: `pushed` is the number of running Dots whose computer was given it at once. */
+/** What saving the Model API key did: `pushed` is the number of running Dots whose computer was given it at once. */
 export function keySavedMessage(pushed: number): string {
   if (pushed === 0) return "Saved. No Dot's computer is running, so each gets the key when it starts.";
   return `Saved. Pushed to ${pushed} running ${pushed === 1 ? "Dot" : "Dots"}.`;

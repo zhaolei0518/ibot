@@ -85,7 +85,7 @@ export async function runSetupAll(deps: SetupAllDeps): Promise<number> {
 This computer is ready. To use it:
   1. start the server and leave it running:   invisible-dots server
   2. open ${webAddress(deps.env)} in your browser
-  3. the page asks for your OpenRouter key, then lets you create your first Dot.
+  3. the page asks for your Model API key, then lets you create your first Dot.
 `);
   return EXIT.ok;
 }

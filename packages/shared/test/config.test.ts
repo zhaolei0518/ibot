@@ -134,9 +134,9 @@ describe("parseDotConfig", () => {
     expect(parseDotConfig({ ...MINIMAL, name: "dot-2" }).name).toBe("dot-2");
   });
 
-  it("accepts only the openrouter provider", () => {
+  it("rejects providers outside the supported gateway types", () => {
     const issues = issuesOf({ ...MINIMAL, model: { provider: "openai", id: "gpt-5" } });
-    expect(issues).toEqual(['model.provider: model.provider must be "openrouter"']);
+    expect(issues).toEqual(["model.provider: Invalid discriminator value. Expected 'openrouter' | 'openai_compatible'"]);
   });
 
   it("requires a model, and has no goal: what a Dot is for is what its person asks of it", () => {
@@ -339,5 +339,23 @@ describe("resolvePermission", () => {
     expect(resolvePermission(defaults, "computer.reboot")).toBe("deny");
     expect(resolvePermission(defaults, "network.raw")).toBe("deny");
     expect(resolvePermission({ permissions: { "computer.reboot": "allow" } } as never, "computer.reboot")).toBe("deny");
+  });
+});
+
+describe("private Chat Completions gateway", () => {
+  const model = {
+    provider: "openai_compatible", id: "gpt-6.1-sol", base_url: "http://127.0.0.1:8317/v1",
+    context_tokens: 32000, max_output_tokens: 1024, input_cost_per_million: 2, output_cost_per_million: 8,
+  };
+  it("preserves gateway settings in the guest config", () => {
+    expect(toRuntimeConfig(parseDotConfig({ name: "private", model })).model).toEqual(model);
+  });
+  it("requires explicit rates and valid limits/URL, and refuses roles with unconfigured models", () => {
+    for (const patch of [ { input_cost_per_million: undefined }, { base_url: "file:///tmp" },
+      { base_url: "http://user:password@host/v1" }, { max_output_tokens: 32000 }, { output_cost_per_million: Infinity } ]) {
+      expect(() => parseDotConfig({ name: "private", model: { ...model, ...patch } })).toThrow();
+    }
+    expect(() => parseDotConfig({ name: "private", model, models: { summary: "other" } })).toThrow();
+    expect(() => parseDotConfig({ name: "private", model: { ...model, input_cost_per_million: 0, output_cost_per_million: 0 } })).not.toThrow();
   });
 });

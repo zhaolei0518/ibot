@@ -851,7 +851,7 @@ export class Scheduler {
     return this.mcpSecrets(dot.id);
   }
 
-  /** Store the OpenRouter key (global or per Dot) and push it to the READY guests it applies to. */
+  /** Store the Model API key (global or per Dot) and push it to the READY guests it applies to. */
   async setOpenRouterKey(value: unknown, dotIdOrName?: unknown): Promise<{ pushed: number }> {
     const checked = checkOpenRouterKey(value);
     if (!checked.ok) throw new ControlPlaneError(400, "invalid_request", checked.problem);
@@ -868,7 +868,7 @@ export class Scheduler {
       try {
         if (await this.lifecycle.syncGuest(dotId)) pushed++;
       } catch (error) {
-        this.#log.warn("could not push the new OpenRouter key", { dotId, error: errorMessage(error) });
+        this.#log.warn("could not push the new Model API key", { dotId, error: errorMessage(error) });
       }
     }
     // Dots that failed READY only for want of a key can be retried now.
@@ -909,7 +909,7 @@ export class Scheduler {
     return sleeping;
   }
 
-  /** The database answers, and whether the global OpenRouter key is stored (and decrypts). */
+  /** The database answers, and whether the global Model API key is stored (and decrypts). */
   async health(): Promise<{ database: "ok"; openrouter_configured: boolean }> {
     let key: string | null;
     try {

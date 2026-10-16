@@ -10,7 +10,7 @@ import { Input } from "../ui/input";
 
 /**
  * The Dot's VM proxy: the whole computer of the Dot goes out through it, the browser included, which then takes its
- * time zone and language from that exit. Write-only like the OpenRouter key: the control plane keeps it encrypted and
+ * time zone and language from that exit. Write-only like the Model API key: the control plane keeps it encrypted and
  * says only whether one is set. A change is used from the Dot's next start.
  */
 export function VmProxy({ dotId }: { dotId: string }) {

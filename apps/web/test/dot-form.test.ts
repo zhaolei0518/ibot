@@ -4,6 +4,7 @@ import {
   configIssues,
   configToForm,
   DEFAULT_MODEL_ID,
+  DEFAULT_MODEL,
   emptyForm,
   FORM_BOUNDS,
   formIssues,
@@ -22,7 +23,7 @@ function filled(change: Partial<DotForm> = {}): DotForm {
 describe("the empty form", () => {
   it("starts from the schema's own defaults, so a new Dot gets what an omitted field would", () => {
     const config = parseDotConfig(formToConfig(filled()));
-    const bare = parseDotConfig({ name: "fare-watch", model: { provider: "openrouter", id: DEFAULT_MODEL_ID } });
+    const bare = parseDotConfig({ name: "fare-watch", model: { ...DEFAULT_MODEL } });
     expect(config.computer).toEqual(bare.computer);
     expect(config.limits).toEqual(bare.limits);
     for (const permission of PERMISSIONS) expect(resolvePermission(config, permission)).toBe(resolvePermission(bare, permission));
@@ -53,7 +54,7 @@ describe("formToConfig", () => {
   it("writes what the controls show in the shape of the config, and nothing for what is empty", () => {
     expect(formToConfig(filled())).toEqual({
       name: "fare-watch",
-      model: { provider: "openrouter", id: DEFAULT_MODEL_ID },
+      model: { ...DEFAULT_MODEL },
       computer: { cpu: 2, memory: "4gb", disk: "40gb", idle_timeout: "15m" },
       permissions: {},
       limits: { max_cost_per_task_usd: 1 },
@@ -61,10 +62,10 @@ describe("formToConfig", () => {
   });
 
   it("adds instructions and the summary role only when they are filled in", () => {
-    const config = formToConfig(filled({ instructions: "Write to fares.csv.", summaryModelId: "a/summary" }));
+    const config = formToConfig(filled({ instructions: "Write to fares.csv.", summaryModelId: DEFAULT_MODEL_ID }));
     expect(config.instructions).toBe("Write to fares.csv.");
-    expect(config.models).toEqual({ summary: "a/summary" });
-    expect(parseDotConfig(config).models).toEqual({ summary: "a/summary" });
+    expect(config.models).toEqual({ summary: DEFAULT_MODEL_ID });
+    expect(parseDotConfig(config).models).toEqual({ summary: DEFAULT_MODEL_ID });
   });
 
   it("carries a preset into the permissions the API receives", () => {
@@ -102,7 +103,7 @@ describe("name validation", () => {
 
 describe("the YAML editor", () => {
   it("shows the form's config and reads the same form back", () => {
-    const form = filled({ instructions: "line one\nline two\n", summaryModelId: "a/summary", cpu: 4, memoryGib: 8, diskGib: 100, idleTimeout: "0", permissions: presetPermissions("autonomous"), maxCostUsd: 2.5 });
+    const form = filled({ instructions: "line one\nline two\n", summaryModelId: DEFAULT_MODEL_ID, cpu: 4, memoryGib: 8, diskGib: 100, idleTimeout: "0", permissions: presetPermissions("autonomous"), maxCostUsd: 2.5 });
     const read = yamlToForm(formToYaml(form));
     expect(read).toEqual({ ok: true, form });
   });
@@ -152,4 +153,19 @@ describe("configToForm", () => {
     const config = parseDotConfig({ name: "a", model: { provider: "openrouter", id: "a/b" }, computer: { memory: "16gb", disk: "512gb" } });
     expect(configToForm(config)).toMatchObject({ memoryGib: 16, diskGib: 512 });
   });
+});
+
+it("preserves private gateway settings across YAML and form switches", () => {
+  const read = yamlToForm(`name: private
+model:
+  provider: openai_compatible
+  id: gpt-6.1-sol
+  base_url: http://127.0.0.1:8317/v1
+  context_tokens: 32000
+  max_output_tokens: 1024
+  input_cost_per_million: 2
+  output_cost_per_million: 8
+`);
+  expect(read.ok).toBe(true);
+  if (read.ok) expect(parseDotConfig(formToConfig(read.form)).model).toMatchObject({ provider: "openai_compatible", base_url: "http://127.0.0.1:8317/v1", id: "gpt-6.1-sol" });
 });

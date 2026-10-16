@@ -55,7 +55,7 @@ export interface DoctorDeps {
   images(): Promise<DoctorCheck[]>;
   /** Where the built web client is, and the first file of it that is missing. Only a process that serves the web client (`invisible-dots server`) has one: without it the report has no web row. */
   webBuild?(): Promise<WebBuild>;
-  /** Whether an OpenRouter key is stored. */
+  /** Whether a model API key is stored. */
   openRouterKey(): Promise<DoctorCheck>;
 }
 
@@ -268,7 +268,7 @@ export async function runDoctor(deps: DoctorDeps): Promise<DoctorCheck[]> {
   }
   const webBuild = deps.webBuild;
   if (webBuild) results.push(await guarded("web", "web client", async () => checkWebBuild(await webBuild())));
-  results.push(await guarded("openrouter", "OpenRouter key", () => deps.openRouterKey()));
+  results.push(await guarded("openrouter", "Model API key", () => deps.openRouterKey()));
   return results;
 }
 
@@ -282,10 +282,10 @@ export function doctorAnswer(results: readonly DoctorCheck[]): DoctorAnswer {
 }
 
 /**
- * The OpenRouter key row from what the control plane knows (`openrouter_configured` of its health), asked of
+ * The Model API key row from what the control plane knows (`openrouter_configured` of its health), asked of
  * the scheduler in the API and of the running server by the CLI.
  */
 export function openRouterCheck(configured: boolean): DoctorCheck {
-  const base = { id: "openrouter", label: "OpenRouter key" } as const;
+  const base = { id: "openrouter", label: "Model API key" } as const;
   return configured ? { ...base, status: "ok", detail: "stored" } : { ...base, status: "missing", detail: "no key stored", fix: STORE_OPENROUTER_KEY };
 }

@@ -50,7 +50,7 @@ export function healthyDoctor(overrides: Partial<DoctorDeps> = {}) {
     home: "/home/someone/.invisible-dots",
     freeSpace: async () => ({ path: "/home/someone/.invisible-dots", bytes: 100 * 1024 ** 3 }),
     images: async () => [ok("golden-image", "golden image", "golden-1.qcow2 matches its manifest"), ok("runtime-image", "runtime ISO", "runtime-1.iso matches its manifest")],
-    openRouterKey: async () => ok("openrouter", "OpenRouter key", "stored"),
+    openRouterKey: async () => ok("openrouter", "Model API key", "stored"),
     ...overrides,
   };
   return { deps, calls: runner.calls };

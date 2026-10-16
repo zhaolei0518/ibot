@@ -13,7 +13,7 @@ import { Input } from "../ui/input";
 import { useAction } from "../ui";
 
 /**
- * The OpenRouter key every Dot's model requests are paid with. The field is write-only: the key goes to the control
+ * The Model API key every Dot's model requests are paid with. The field is write-only: the key goes to the control
  * plane, which keeps it encrypted, and nothing ever sends it back, so whether it is stored comes from the health
  * answer, and the answer to saving one says how many running Dots were given it at once.
  */
@@ -52,16 +52,8 @@ export function KeyForm() {
       ) : null}
       <Field
         id="openrouter-key"
-        label={configured ? "Replace the key" : "OpenRouter API key"}
-        hint={
-          <>
-            Stored encrypted by the control plane and never shown again. Create one at{" "}
-            <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" className="text-primary underline underline-offset-2">
-              openrouter.ai/keys
-            </a>
-            .
-          </>
-        }
+        label={configured ? "Replace the key" : "Model API key"}
+        hint="Use the API key or bearer token from your model provider (CPA, OpenRouter, or another compatible gateway). Stored encrypted and never shown again."
         error={problem}
       >
         {(control) => (
@@ -71,7 +63,7 @@ export function KeyForm() {
             type="password"
             autoComplete="off"
             spellCheck={false}
-            placeholder="sk-or-..."
+            placeholder="API key or bearer token"
             value={value}
             onChange={(event) => {
               setValue(event.target.value);

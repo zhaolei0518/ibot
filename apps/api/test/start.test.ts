@@ -148,7 +148,7 @@ describe("startServer on an empty INVISIBLE_DOTS_HOME", { timeout: 120_000 }, ()
     expect(row("openrouter")).toMatchObject({ status: "missing", detail: "no key stored", fix: "invisible-dots secret openrouter" });
 
     await api.setOpenRouterKey("sk-or-first");
-    expect((await api.doctor()).checks.find((c) => c.id === "openrouter")).toEqual({ id: "openrouter", label: "OpenRouter key", status: "ok", detail: "stored" });
+    expect((await api.doctor()).checks.find((c) => c.id === "openrouter")).toEqual({ id: "openrouter", label: "Model API key", status: "ok", detail: "stored" });
   });
 
   it("runs one host report at a time: requests that arrive while it runs share its answer", async () => {

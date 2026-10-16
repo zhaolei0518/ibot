@@ -137,7 +137,7 @@ describe("setup", () => {
       { id: "golden-image", label: "golden image", status: "ok", detail: "" },
       { id: "runtime-image", label: "runtime ISO", status: "ok", detail: "" },
       { id: "web", label: "web client", status: "ok", detail: "" },
-      { id: "openrouter", label: "OpenRouter key", status: "failed", detail: "" },
+      { id: "openrouter", label: "Model API key", status: "failed", detail: "" },
     ];
     expect(nextSteps(missingKey)).toEqual([
       "invisible-dots server   (keep it running, then in another terminal:)",
@@ -151,7 +151,7 @@ describe("setup", () => {
       { id: "golden-image", label: "golden image", status: "ok", detail: "" },
       { id: "runtime-image", label: "runtime ISO", status: "ok", detail: "" },
       { id: "web", label: "web client", status: "missing", detail: "", fix: WEB_BUILD_COMMAND },
-      { id: "openrouter", label: "OpenRouter key", status: "ok", detail: "" },
+      { id: "openrouter", label: "Model API key", status: "ok", detail: "" },
     ];
     expect(nextSteps(notBuilt)).toEqual(["npm run build --workspace @invisible-dots/web", "invisible-dots server"]);
   });
@@ -160,7 +160,7 @@ describe("setup", () => {
     const noWebRow: DoctorCheck[] = [
       { id: "golden-image", label: "golden image", status: "ok", detail: "" },
       { id: "runtime-image", label: "runtime ISO", status: "ok", detail: "" },
-      { id: "openrouter", label: "OpenRouter key", status: "ok", detail: "" },
+      { id: "openrouter", label: "Model API key", status: "ok", detail: "" },
     ];
     expect(nextSteps(noWebRow)).toEqual(["invisible-dots server"]);
   });

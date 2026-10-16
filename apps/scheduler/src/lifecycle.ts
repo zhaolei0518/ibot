@@ -82,7 +82,7 @@ export interface LifecycleDeps {
 export type StopRequest = Exclude<StopReason, "exited">;
 
 /** Part of the error a Dot gets when READY failed only for want of a key; setting a key retries those Dots. */
-export const MISSING_KEY_MESSAGE = "no OpenRouter API key is configured";
+export const MISSING_KEY_MESSAGE = "no model API key is configured";
 
 /** The READY procedure failed; the message says which step and why. */
 export class NotReadyError extends ControlPlaneError {
@@ -370,7 +370,7 @@ export class Lifecycle {
   }
 
   /**
-   * Push what the guest must hold: the OpenRouter key and the secrets the
+   * Push what the guest must hold: the Model API key and the secrets the
    * config's MCP servers name (memory only in the guest, so lost with every
    * agent restart), then the runtime config, all read from the database now.
    * The one place that does this, for READY, for a changed key, secret or
@@ -386,13 +386,13 @@ export class Lifecycle {
       await guest.pushSecrets({ openrouter_api_key: key, mcp_secrets: mcpSecrets });
     } catch (error) {
       // Never the guest's own words here: whatever answered may have echoed a secret.
-      throw new Error(`the guest did not take the OpenRouter key and the MCP secrets (${describeWithoutBody(error)})`);
+      throw new Error(`the guest did not take the Model API key and the MCP secrets (${describeWithoutBody(error)})`);
     }
     await guest.putConfig(toRuntimeConfig(dot.config));
   }
 
   /**
-   * Section 9.3: wait for dot-agentd and the agent, push the OpenRouter key,
+   * Section 9.3: wait for dot-agentd and the agent, push the Model API key,
    * push the runtime config, then require the agent to report the key and
    * every self-check. Only then is the Dot READY and its events pumped.
    */
@@ -432,7 +432,7 @@ export class Lifecycle {
       const problems: string[] = [];
       if (health.agent.status !== "ok") problems.push(`agent status ${health.agent.status}`);
       else {
-        if (!health.agent.openrouter_configured) problems.push("the agent does not report the OpenRouter key as configured");
+        if (!health.agent.openrouter_configured) problems.push("the agent does not report the Model API key as configured");
         const checks = health.agent.checks;
         if (!checks) problems.push("the agent reports no self-checks");
         else {

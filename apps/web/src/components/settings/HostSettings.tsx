@@ -14,7 +14,7 @@ import { useHostChecks } from "../setup/use-host-checks";
 import { Skeleton } from "../ui/skeleton";
 
 /**
- * The host settings (S13): whether this computer can run a Dot and what to run when it cannot, the OpenRouter key,
+ * The host settings (S13): whether this computer can run a Dot and what to run when it cannot, the Model API key,
  * the look of the page, the session, and where the control plane keeps its state. Settings of one Dot live on that
  * Dot's page, not here.
  */
@@ -26,7 +26,7 @@ export function HostSettings() {
         <p className="text-sm text-muted-foreground">This computer and this browser. What a single Dot may do is set on its own page.</p>
       </div>
       <HostChecks />
-      <Section id="key" title="OpenRouter key" description="Every Dot's model requests are paid with it. A new key is pushed to the running Dots at once.">
+      <Section id="key" title="Model credentials" description="Default key for CPA, OpenRouter, or another compatible gateway. Dots with their own key keep using it; other running Dots receive the new default.">
         <KeyForm />
       </Section>
       <Appearance />

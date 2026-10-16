@@ -52,13 +52,13 @@ import { prepareHost, runSetup, type SetupDeps } from "./setup/setup.js";
 import { locateWebBuild, startWebServer } from "./web.js";
 
 /**
- * Whether the running server holds an OpenRouter key. The key lives in the
+ * Whether the running server holds a model API key. The key lives in the
  * database, and the embedded PGlite database belongs to the one server
  * process that has it open (a second opener would corrupt it), so doctor
  * asks the server instead of reading the database.
  */
 async function openRouterKey(env: Record<string, string | undefined>, fetchImpl?: typeof fetch): Promise<DoctorCheck> {
-  const base = { id: "openrouter", label: "OpenRouter key" } as const;
+  const base = { id: "openrouter", label: "Model API key" } as const;
   let health: unknown;
   try {
     health = await (await connectApi(env, fetchImpl)).health();

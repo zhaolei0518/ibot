@@ -358,7 +358,7 @@ export interface SecretsRequest {
 }
 
 /**
- * What an OpenRouter key is made of, as one rule with two readers: the host refuses a key that breaks it when the
+ * What a model API key is made of, as one rule with two readers: the host refuses a key that breaks it when the
  * user enters it (`checkOpenRouterKey`), and the guest engine refuses it again on `POST /secrets`
  * (nanobot/dots/protocol.py keeps a copy of these two constants; tests/repo/vendored-nanobot.test.ts keeps the
  * copy equal). The key travels in an Authorization header, so it is printable ASCII with no space; any other
@@ -373,12 +373,12 @@ export type OpenRouterKeyCheck = { ok: true; key: string } | { ok: false; proble
 export function checkOpenRouterKey(value: unknown): OpenRouterKeyCheck {
   if (typeof value !== "string" || value.trim() === "") return { ok: false, problem: "value must be a non-empty string" };
   const key = value.trim();
-  if (!new RegExp(`^${OPENROUTER_KEY_PATTERN}$`).test(key)) return { ok: false, problem: `value is not an OpenRouter key: ${OPENROUTER_KEY_RULE}` };
+  if (!new RegExp(`^${OPENROUTER_KEY_PATTERN}$`).test(key)) return { ok: false, problem: `value is not a model API key: ${OPENROUTER_KEY_RULE}` };
   return { ok: true, key };
 }
 
 /**
- * What the value of an MCP server's secret is made of, as one rule with two readers like the OpenRouter key's: the host
+ * What the value of an MCP server's secret is made of, as one rule with two readers like the Model API key's: the host
  * refuses a value that breaks it when the person sets it (`checkMcpSecret`), and the engine again on `POST /secrets`
  * (nanobot/dots/protocol.py keeps a copy; tests/repo/vendored-nanobot.test.ts keeps it equal). A secret becomes an
  * environment variable or an HTTP header, often `Bearer <token>`, so a space is allowed and a control character,

@@ -113,13 +113,13 @@ describe("Settings: host checks", () => {
   });
 });
 
-describe("Settings: the OpenRouter key", () => {
-  const keyField = () => screen.getByLabelText(/^(OpenRouter API key|Replace the key)$/) as HTMLInputElement;
+describe("Settings: the Model API key", () => {
+  const keyField = () => screen.getByLabelText(/^(Model API key|Replace the key)$/) as HTMLInputElement;
 
   it("is a write-only field, and says whether a key is stored from the health answer", async () => {
     plane.keyConfigured = false;
     await renderSettings();
-    await waitFor(() => expect(within(section("OpenRouter key")).getByText("No key is stored.")).toBeTruthy());
+    await waitFor(() => expect(within(section("Model credentials")).getByText("No key is stored.")).toBeTruthy());
     expect(keyField().type).toBe("password");
     expect(keyField().autocomplete).toBe("off");
     expect((screen.getByRole("button", { name: "Save key" }) as HTMLButtonElement).disabled).toBe(true);
@@ -130,18 +130,18 @@ describe("Settings: the OpenRouter key", () => {
     plane.keyPushedTo = 2;
     await renderSettings();
     await waitFor(() => expect(screen.getByTestId("rail-key").textContent).toBe("false"));
-    await userEvent.type(keyField(), "  sk-or-v1-abcdef  ");
+    await userEvent.type(keyField(), "  cpa-test-token  ");
     await userEvent.click(screen.getByRole("button", { name: "Save key" }));
 
     expect(await screen.findByText("Saved. Pushed to 2 running Dots.")).toBeTruthy();
-    expect(plane.savedKeys).toEqual(["sk-or-v1-abcdef"]);
+    expect(plane.savedKeys).toEqual(["cpa-test-token"]);
     // The field is emptied and the key is nowhere on the page: it is write-only.
     expect(keyField().value).toBe("");
-    expect(document.body.textContent).not.toContain("sk-or-v1-abcdef");
+    expect(document.body.textContent).not.toContain("cpa-test-token");
     // The shared health answer was asked again, so the rail, the checklist and this form agree at once.
     await waitFor(() => expect(screen.getByTestId("rail-key").textContent).toBe("true"));
-    await waitFor(() => expect(within(section("OpenRouter key")).getByText("A key is stored.")).toBeTruthy());
-    await waitFor(() => expect(checkLine("OpenRouter key")).toBe("OpenRouter key: ReadyStored."));
+    await waitFor(() => expect(within(section("Model credentials")).getByText("A key is stored.")).toBeTruthy());
+    await waitFor(() => expect(checkLine("Model API key")).toBe("Model API key: ReadyStored."));
     expect(screen.getByRole("button", { name: "Replace key" })).toBeTruthy();
   });
 

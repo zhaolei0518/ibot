@@ -505,3 +505,16 @@ class TestTheEngineServed:
         await asyncio.wait_for(served.task, 30)
 
         assert seen == {"connected": False, "stream_ended": True}
+
+async def test_private_gateway_health_follows_config_without_stale_openrouter_check():
+    # The environment target is unreachable; configuring the gateway must replace it immediately.
+    async with serving(lambda env: object.__setattr__(env, "network_check", "127.0.0.1:1")) as api:
+        assert json.loads((await api.call("GET", "/health"))[1])["checks"]["network_reachable"] is False
+        model = dict(provider="openai_compatible", id="gpt-6.1-sol", base_url=f"http://127.0.0.1:{api.fake.port}/v1",
+                     context_tokens=32000, max_output_tokens=1024, input_cost_per_million=2, output_cost_per_million=8)
+        assert (await api.call("PUT", "/config", runtime_config_body(model=model)))[0] == 204
+        assert json.loads((await api.call("GET", "/health"))[1])["checks"]["network_reachable"] is True
+        # Changing target invalidates the previous success cache too.
+        model['base_url'] = 'http://127.0.0.1:1/v1'
+        assert (await api.call("PUT", "/config", runtime_config_body(model=model)))[0] == 204
+        assert json.loads((await api.call("GET", "/health"))[1])["checks"]["network_reachable"] is False

@@ -13,7 +13,7 @@ describe("doctor report", () => {
     { id: "node", label: "Node", status: "ok", detail: "24.19.0" },
     { id: "qemu", label: "QEMU", status: "missing", detail: "qemu-system-x86_64 not found", fix: "invisible-dots setup" },
     { id: "disk", label: "data directory", status: "failed", detail: "1.0 GiB free at /data", fix: "free some space" },
-    { id: "openrouter", label: "OpenRouter key", status: "ok", detail: "stored" },
+    { id: "openrouter", label: "Model API key", status: "ok", detail: "stored" },
   ];
 
   it("prints one aligned line per check, a fix line under each that is not ok, and a count", () => {
@@ -24,7 +24,7 @@ describe("doctor report", () => {
         "                         fix: invisible-dots setup",
         "failed   data directory  1.0 GiB free at /data",
         "                         fix: free some space",
-        "ok       OpenRouter key  stored",
+        "ok       Model API key   stored",
         "4 checks: 2 ok, 1 missing, 1 failed",
         "",
       ].join("\n"),

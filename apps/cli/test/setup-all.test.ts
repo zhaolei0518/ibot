@@ -34,7 +34,7 @@ describe("setup --all", () => {
     expect(result.text).toContain("1. start the server and leave it running:   invisible-dots server");
     expect(result.text).toContain(`2. open http://${DEFAULT_WEB_LISTEN} in your browser\n`);
     expect(result.text).not.toMatch(/sign in|api\.token/);
-    expect(result.text).toContain("OpenRouter key");
+    expect(result.text).toContain("Model API key");
   });
 
   it("names the address the web client is configured to listen on", async () => {

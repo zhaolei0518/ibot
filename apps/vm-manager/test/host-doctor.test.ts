@@ -52,7 +52,7 @@ describe("hostDoctorDeps", () => {
       env: { INVISIBLE_DOTS_QEMU_DIR: join(dir, "nothing") },
       home: dir,
       images: async () => [ok("golden-image", "golden image")],
-      openRouterKey: async () => ok("openrouter", "OpenRouter key"),
+      openRouterKey: async () => ok("openrouter", "Model API key"),
     });
     expect(deps.nodeVersion).toBe(process.versions.node);
     expect(deps.home).toBe(dir);

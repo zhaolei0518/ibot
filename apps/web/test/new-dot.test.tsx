@@ -8,6 +8,8 @@ import { AttentionProvider } from "../src/components/shell/attention";
 import { stubMatchMedia } from "./support/browser";
 import { dotRecord, FakeControlPlane } from "./support/control-plane";
 
+import { DEFAULT_MODEL, DEFAULT_MODEL_ID } from "../src/lib/dot-form";
+
 const push = vi.hoisted(() => vi.fn());
 vi.mock("next/navigation", () => ({ usePathname: () => "/new", useRouter: () => ({ push, replace() {} }) }));
 
@@ -80,7 +82,7 @@ describe("Create a Dot: the form", () => {
       {
         name: "fare-watch",
         instructions: "Write to fares.csv.",
-        model: { provider: "openrouter", id: "z-ai/glm-5.3-flash" },
+        model: { ...DEFAULT_MODEL },
         computer: { cpu: 4, memory: "8gb", disk: "40gb", idle_timeout: "30m" },
         permissions: {},
         limits: { max_cost_per_task_usd: 1 },
@@ -102,14 +104,14 @@ describe("Create a Dot: the form", () => {
   it("sends the summary model, and the cost cap that was typed", async () => {
     await renderPage();
     await fillIdentity();
-    await userEvent.type(screen.getByLabelText(/Summary model/), "a/summary");
+    await userEvent.type(screen.getByLabelText(/Summary model/), DEFAULT_MODEL_ID);
     const cap = screen.getByLabelText("Spending cap per task");
     await userEvent.clear(cap);
     await userEvent.type(cap, "2.5");
     await userEvent.click(screen.getByRole("button", { name: "Create Dot" }));
     await waitFor(() => expect(plane.created).toHaveLength(1));
     const sent = plane.created[0] as { models: unknown; limits: unknown };
-    expect(sent.models).toEqual({ summary: "a/summary" });
+    expect(sent.models).toEqual({ summary: DEFAULT_MODEL_ID });
     expect(sent.limits).toEqual({ max_cost_per_task_usd: 2.5 });
   });
 
@@ -196,7 +198,7 @@ describe("Create a Dot: before you create", () => {
     await waitFor(() => expect(within(panel).getAllByRole("listitem")).toHaveLength(ROWS));
     expect(checkLine(panel, "Control plane")).toBe("Control plane: ReadyAnswering, version 9.9.9.");
     expect(checkLine(panel, "Database")).toBe("Database: ReadyAnswering.");
-    expect(checkLine(panel, "OpenRouter key")).toBe("OpenRouter key: ReadyStored.");
+    expect(checkLine(panel, "Model API key")).toBe("Model API key: ReadyStored.");
     expect(checkLine(panel, "QEMU")).toBe("QEMU: Ready8.2.2");
     expect(checkLine(panel, "golden image")).toBe("golden image: Readygolden-1.qcow2 matches its manifest");
   });
@@ -206,7 +208,7 @@ describe("Create a Dot: before you create", () => {
     await renderPage();
     const panel = await screen.findByRole("region", { name: "Before you create" });
     await waitFor(() => expect(within(panel).getAllByRole("listitem")).toHaveLength(ROWS));
-    expect(checkLine(panel, "OpenRouter key")).toMatch(/^OpenRouter key: Needs attention.*cannot answer until one is/);
+    expect(checkLine(panel, "Model API key")).toMatch(/^Model API key: Needs attention.*cannot answer until one is/);
     expect(checkLine(panel, "Control plane")).toContain(": Ready");
     await fillIdentity();
     await userEvent.click(screen.getByRole("button", { name: "Create Dot" }));

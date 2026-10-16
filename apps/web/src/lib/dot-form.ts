@@ -29,10 +29,19 @@ export function gibSize(gib: number): string {
   return `${gib}gb`;
 }
 
-/** The model a new Dot starts with: the one the architecture document's example uses. */
-export const DEFAULT_MODEL_ID = "z-ai/glm-5.3-flash";
+/** The configured model and gateway for this deployment; credentials remain in the secret store. */
+export const DEFAULT_MODEL: DotConfig["model"] = {
+  "id": "z-ai/glm-5.3-flash",
+  "base_url": "https://llm.api.zyuncs.com/v1",
+  "provider": "openai_compatible",
+  "context_tokens": 32000,
+  "max_output_tokens": 1024,
+  "input_cost_per_million": 2,
+  "output_cost_per_million": 8
+};
+export const DEFAULT_MODEL_ID = DEFAULT_MODEL.id;
 
-/** What the model field suggests; any OpenRouter model id may be typed instead. */
+/** What the model field suggests; model identifiers are interpreted by the configured gateway. */
 export const MODEL_SUGGESTIONS: readonly string[] = [DEFAULT_MODEL_ID];
 
 export interface IdleChoice {
@@ -62,6 +71,8 @@ export interface DotForm {
   name: string;
   instructions: string;
   modelId: string;
+  /** Preserve the provider and gateway settings when editing or switching from YAML. */
+  modelConfig: DotConfig["model"];
   /** The model that writes summaries; empty means the Dot's own model does. */
   summaryModelId: string;
   cpu: number;
@@ -78,6 +89,7 @@ export function emptyForm(): DotForm {
     name: "",
     instructions: "",
     modelId: DEFAULT_MODEL_ID,
+    modelConfig: { ...DEFAULT_MODEL },
     summaryModelId: "",
     cpu: CONFIG_BOUNDS.cpu.default,
     memoryGib: gibOf(CONFIG_BOUNDS.memory.default),
@@ -92,7 +104,7 @@ export function emptyForm(): DotForm {
 export function formToConfig(form: DotForm): Record<string, unknown> {
   const config: Record<string, unknown> = {
     name: form.name,
-    model: { provider: "openrouter", id: form.modelId },
+    model: { ...form.modelConfig, id: form.modelId },
     computer: { cpu: form.cpu, memory: gibSize(form.memoryGib), disk: gibSize(form.diskGib), idle_timeout: form.idleTimeout },
     permissions: { ...form.permissions },
     limits: { max_cost_per_task_usd: form.maxCostUsd },
@@ -107,6 +119,7 @@ export function configToForm(config: DotConfig): DotForm {
     name: config.name,
     instructions: config.instructions ?? "",
     modelId: config.model.id,
+    modelConfig: { ...config.model },
     summaryModelId: config.models.summary ?? "",
     cpu: config.computer.cpu,
     memoryGib: gibOf(config.computer.memory),

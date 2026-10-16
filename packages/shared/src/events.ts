@@ -173,7 +173,7 @@ export const TOOL_TARGET_MAX = 160;
 export interface OutboundEventDataMap {
   /**
    * The agent process started (a boot, or a restart by systemd inside a
-   * running VM). It keeps the OpenRouter key in memory only, so the host
+   * running VM). It keeps the Model API key in memory only, so the host
    * pushes the key again when it sees this.
    */
   "agent.started": Record<string, never>;

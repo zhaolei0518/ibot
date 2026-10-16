@@ -32,6 +32,10 @@ class EngineSettings:
     # The system prompt section that says whose Dot this is and what it is for.
     dot_prompt: str
 
+    provider: str = "openrouter"
+    # Immutable settings from the validated model section, for compatible endpoints.
+    compatible: tuple[str, int, int, float, float] | None = None
+
     def model_for(self, role: str) -> str:
         """The model for a role: the one the config names for it, else the Dot's own model."""
         if role not in MODEL_ROLES:
@@ -44,6 +48,10 @@ def project(config: DotRuntimeConfig, *, workspace: str, openrouter_base_url: st
     named = config.models or {}
     return EngineSettings(
         model_id=config.model.id,
+        provider=config.model.provider,
+        compatible=(config.model.base_url, config.model.context_tokens, config.model.max_output_tokens,
+                    config.model.input_cost_per_million, config.model.output_cost_per_million)
+                   if config.model.provider == "openai_compatible" else None,
         models=tuple((role, named[role]) for role in MODEL_ROLES if role in named),
         openrouter_base_url=(openrouter_base_url or "").strip() or None,
         offered_tools=tuple(offered),

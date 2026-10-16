@@ -2,7 +2,7 @@
  * The doctor's dependencies on the real machine (architecture section 11.1):
  * QEMU discovery, the accelerator, the free disk space and the process
  * runner. What needs more than the vm-manager knows, the images' manifests
- * and the OpenRouter key, is handed in by the caller: the API process asks
+ * and the Model API key, is handed in by the caller: the API process asks
  * its own Scheduler, `invisible-dots doctor` asks the running server.
  */
 import { stat, statfs } from "node:fs/promises";
@@ -58,7 +58,7 @@ export interface HostDoctorOptions {
   home: string;
   /** The golden image and the runtime ISO against their manifests, one row each. */
   images(): Promise<DoctorCheck[]>;
-  /** The OpenRouter key row (`openRouterCheck` for a known answer). */
+  /** The Model API key row (`openRouterCheck` for a known answer). */
   openRouterKey(): Promise<DoctorCheck>;
 }
 

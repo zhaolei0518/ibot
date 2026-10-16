@@ -63,7 +63,7 @@ def _model_slug(model_name: str) -> str:
 def _requires_max_completion_tokens(model_name: str) -> bool:
     """Return True for models that require ``max_completion_tokens``."""
     slug = _model_slug(model_name)
-    return slug == _KIMI_K3_MODEL or "gpt-5" in slug or any(
+    return slug == _KIMI_K3_MODEL or "gpt-5" in slug or "gpt-6" in slug or any(
         slug == p or slug.startswith((p + "-", p + ".")) for p in ("o1", "o3", "o4")
     )
 

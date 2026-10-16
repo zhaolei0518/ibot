@@ -2,7 +2,7 @@
  * The environment a child process gets: an allowlist of the parent's
  * variables, never a copy with things removed. The control plane's
  * environment can hold INVISIBLE_DOTS_TOKEN and a DATABASE_URL with its
- * password, the agent's the OpenRouter key; a child that needs none of them
+ * password, the agent's the Model API key; a child that needs none of them
  * must not carry them for its whole life (a Dot's QEMU outlives the server
  * that started it). One filter, used for QEMU on the host and for the
  * browser layer in the guest.

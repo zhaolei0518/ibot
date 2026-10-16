@@ -96,13 +96,13 @@ describe("the rail", () => {
     renderShell();
     await waitFor(() => expect(within(rail()).getByText("API: ok")).toBeTruthy());
     expect(within(rail()).getByText("v9.9.9")).toBeTruthy();
-    expect(within(rail()).getByText("No OpenRouter key stored yet")).toBeTruthy();
+    expect(within(rail()).getByText("No model API key stored yet")).toBeTruthy();
   });
 
   it("sends the person from the missing key to the settings page where it is entered", async () => {
     plane.keyConfigured = false;
     renderShell();
-    const warning = await within(rail()).findByRole("link", { name: "No OpenRouter key stored yet" });
+    const warning = await within(rail()).findByRole("link", { name: "No model API key stored yet" });
     expect(warning.getAttribute("href")).toBe("/settings");
   });
 
@@ -122,12 +122,12 @@ describe("the rail", () => {
     vi.useFakeTimers({ shouldAdvanceTime: true });
     try {
       renderShell();
-      await within(rail()).findByText("No OpenRouter key stored yet");
+      await within(rail()).findByText("No model API key stored yet");
       plane.keyConfigured = true;
       await act(async () => {
         await vi.advanceTimersByTimeAsync(30_000);
       });
-      await waitFor(() => expect(within(rail()).queryByText("No OpenRouter key stored yet")).toBeNull());
+      await waitFor(() => expect(within(rail()).queryByText("No model API key stored yet")).toBeNull());
     } finally {
       vi.useRealTimers();
     }

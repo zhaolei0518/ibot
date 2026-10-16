@@ -28,7 +28,7 @@ export function ApiStatus() {
   );
 }
 
-/** While the control plane has no OpenRouter key: a link to where it is entered, on a line of its own under the statuses. */
+/** While the control plane has no model API key: a link to where it is entered, on a line of its own under the statuses. */
 export function MissingKeyNotice({ onNavigate }: { onNavigate?: () => void }) {
   const health = useHealth();
   const state = useApiState();
@@ -36,7 +36,7 @@ export function MissingKeyNotice({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <p className="text-xs text-warn">
       <Link href="/settings" onClick={onNavigate} className="underline underline-offset-2">
-        No OpenRouter key stored yet
+        No model API key stored yet
       </Link>
     </p>
   );

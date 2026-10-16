@@ -195,7 +195,7 @@ export class FakeControlPlane {
     { id: "node", label: "Node.js", status: "ok", detail: "24.1.0" },
     { id: "qemu", label: "QEMU", status: "ok", detail: "8.2.2" },
     { id: "golden-image", label: "golden image", status: "ok", detail: "golden-1.qcow2 matches its manifest" },
-    { id: "openrouter", label: "OpenRouter key", status: "ok", detail: "stored" },
+    { id: "openrouter", label: "Model API key", status: "ok", detail: "stored" },
   ];
   /** Answer `GET /api/doctor` with this status instead of the report. */
   failDoctor: number | null = null;

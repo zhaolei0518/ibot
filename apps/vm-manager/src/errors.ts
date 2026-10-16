@@ -3,7 +3,7 @@
 /** The commands that prepare a host (architecture section 11); errors and the doctor report about the host name them. */
 export const DOCTOR_COMMAND = "invisible-dots doctor";
 export const SETUP_COMMAND = "invisible-dots setup";
-/** Stores the OpenRouter key: in a terminal it asks for it, one line; piped, it reads standard input. */
+/** Stores the Model API key: in a terminal it asks for it, one line; piped, it reads standard input. */
 export const STORE_OPENROUTER_KEY = "invisible-dots secret openrouter";
 
 /** A host command exited non-zero, timed out or could not be started. */
