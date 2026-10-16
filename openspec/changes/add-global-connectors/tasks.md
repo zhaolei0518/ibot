@@ -22,7 +22,8 @@
 - [x] 4.3 Document setup, external blockers and deployment procedure.
 
 ## 5. External acceptance (requires deployment and provider account setup)
-- [ ] 5.1 Configure approved HTTPS callback origin and deploy as the existing zhaoleilei1 account.
-- [ ] 5.2 Complete actual provider consents/client registrations and verify real account read/write operations.
-- [ ] 5.3 Configure Google OAuth application and independent Workspace MCP service.
-- [ ] 5.4 Verify independent endpoints/publishers for the unresolved providers and finish their account setup.
+- [x] 5.1 Deploy core as zhaoleilei1, import six public source sets and verify a real my Bot Skills call.
+- [ ] 5.2 Configure an approved HTTPS callback origin.
+- [ ] 5.3 Complete actual provider consents/client registrations and verify real account read/write operations.
+- [ ] 5.4 Configure Google OAuth application and independent Workspace MCP service.
+- [ ] 5.5 Verify independent endpoints/publishers for the unresolved providers and finish their account setup.

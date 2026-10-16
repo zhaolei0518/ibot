@@ -64,7 +64,7 @@ Useful sources:
 
 ## Deployment
 
-Developed on `feat/global-connectors`, from deployed commit `d4537fe`. Development and tests use an isolated local checkout and temporary databases. No live service or customer account is changed by the local implementation.
+Developed on `feat/global-connectors`, from deployed commit `d4537fe`. Development and tests used an isolated local checkout and temporary databases. Code commit `1872d06` is now deployed on 10.41.82.104:3000, with the six public source sets imported and a Firecrawl Skills-only connection assigned to the existing `my` Bot. External provider accounts have not been authorized.
 
 Use Node >=24.15 (the current locked web test dependencies require it; the existing server's Node 24.22 satisfies it). Install dependencies with `npm ci`, run `npm run typecheck`, relevant tests, then `npm run build`.
 
@@ -74,12 +74,12 @@ The API and web client remain on their existing listeners. Enable the additional
 # The external HTTPS web origin; OAuth redirects return through the existing web API proxy.
 INVISIBLE_DOTS_PUBLIC_URL=https://your-bot-host.example.com
 # Choose a listener reachable from the existing QEMU guests.
-INVISIBLE_DOTS_CONNECTOR_BRIDGE_LISTEN=0.0.0.0:8788
+INVISIBLE_DOTS_CONNECTOR_BRIDGE_LISTEN=127.0.0.1:8788
 # QEMU user-networking's host address. This must resolve from inside the VM.
 INVISIBLE_DOTS_CONNECTOR_BRIDGE_URL=http://10.0.2.2:8788
 ```
 
-For another VM network, change the bridge URL to that network's reachable host address. Restrict the listener to the appropriate host/VM network where possible. The bridge accepts only per-binding credentials, never the control-plane master token. Do not expose the control-plane API to make the bridge reachable.
+The deployed QEMU guests successfully reached this loopback listener through 10.0.2.2. For another VM network, change the bridge URL and listener to that network’s reachable host address. Restrict the listener to the appropriate host/VM network where possible. The bridge accepts only per-binding credentials, never the control-plane master token. Do not expose the control-plane API to make the bridge reachable.
 
 OAuth redirect URI to register with providers that require static registration:
 
@@ -107,3 +107,15 @@ Endpoint changes require a new account to avoid carrying tokens across services.
 Automated fixtures use actual HTTP JSON-RPC and OAuth requests through the official MCP SDK. They cover discovery, encrypted storage, real-client bridge use, tool filtering, forbidden calls, cross-Bot identity, binding removal, disconnect, restart of the manager, DCR, PKCE code exchange, refresh, state expiry/replay and sanitized callbacks. UI tests cover all 14 cards, account setup, provider authorization links and read-only Bot binding. No actual provider consent or user data is used in fixtures.
 
 External acceptance is still pending: HTTPS callback configuration, provider client registrations and account consents; Google OAuth client creation and Workspace MCP deployment; independently usable endpoints for the unresolved providers; actual execution of workflows requiring third-party scripts/reference dependencies that are not part of the data-only import. Those are not represented as successful connections in the UI or as completed external acceptance in OpenSpec.
+
+## Deployment record
+
+- Code: `1872d06` (`feat: add global connectors and scoped MCP access`). No external Git push was performed.
+- UI: `http://10.41.82.104:3000/settings#connectors`.
+- Running release: `/home/zhaoleilei1/invisible-dots/releases/connectors-1872d06`.
+- Existing original checkout remains at `/home/zhaoleilei1/invisible-dots/app`; systemd's `connectors.conf` drop-in selects the release working directory.
+- Service: `invisible-dots.service`, user/group `zhaoleilei1`; API `127.0.0.1:8787`, bridge `127.0.0.1:8788`, guest bridge URL `http://10.0.2.2:8788`.
+- Pre-migration backup: `/home/zhaoleilei1/invisible-dots/backups/pre-connectors-20261016-192802.tar.gz`, mode 0600, containing database and protected config. The service was stopped while the backup was taken. No second PGlite process opened the live database.
+- `my`: MCP server `cx-75a666aff8729992` connected with one allowed tool, `idots_read_plugin_skill`; actual guest -> host bridge -> imported Firecrawl workflow read completed successfully (audit outcome `ok`, 3 ms). The model chose the skill's declared name `firecrawl`; file/folder names need not equal frontmatter names.
+- The existing model provider remains `openai_compatible`; the Bot produced its response through the configured private gateway.
+- OAuth is disabled until an HTTPS callback origin is supplied. The deployment created no OS users or new home-directory accounts.
