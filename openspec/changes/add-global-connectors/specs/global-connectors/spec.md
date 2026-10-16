@@ -62,6 +62,6 @@ The system SHALL include all 14 catalogue entries by default, preset verified pr
 - **WHEN** a user selects GitHub and supplies an access token
 - **THEN** the account uses the verified default endpoint and atomically stores the token encrypted before discovering tools
 
-#### Scenario: Cursor-owned Google Sheets authentication
+#### Scenario: Direct Google Sheets authentication
 - **WHEN** a user opens the Google Sheets preset
-- **THEN** the UI explains the Cursor-managed authentication requirement and does not claim ordinary Google OAuth is supported at that service
+- **THEN** the runtime connects directly to Google’s official Sheets MCP service and explains Google Developer Preview, API enablement and OAuth prerequisites without requiring Cursor credentials

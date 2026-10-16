@@ -25,7 +25,7 @@
 - [x] 5.1 Deploy core as zhaoleilei1, import six public source sets and verify a real my Bot Skills call.
 - [ ] 5.2 Configure an approved HTTPS callback origin.
 - [ ] 5.3 Complete actual provider consents/client registrations and verify real account read/write operations.
-- [ ] 5.4 Configure Google OAuth application and independent Workspace MCP service.
+- [ ] 5.4 Configure Google OAuth application, Developer Preview access and enable official Google Sheets MCP API.
 - [ ] 5.5 Verify independent endpoints/publishers for the unresolved providers and finish their account setup.
 
 ## 6. Built-in service presets
@@ -33,4 +33,5 @@
 - [x] 6.2 Import six additional pinned Cursor manifests; preset verified addresses and provider auth defaults.
 - [x] 6.3 Support atomic token/account creation with hidden default endpoint and optional advanced override.
 - [x] 6.4 Add AIsa using its official quickstart (OAuth or Bearer API key).
-- [ ] 6.5 Complete independent Google Sheets authorization and identify Origin's official service.
+- [ ] 6.5 Complete Google Sheets authorization and identify Origin's official service.
+- [x] 6.6 Replace Cursor Sheets relay with official Google service; verify initialization, tool listing and protected-call authentication.

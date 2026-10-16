@@ -41,11 +41,9 @@ const plugin = (
     ? "token"
     : "oauth",
   unavailable_reason:
-    id === "google-sheets"
-      ? "Cursor’s Google Sheets service requires Cursor-managed authentication (x-cursor-auth). Independent Google OAuth needs a separately configured Workspace service."
-      : id === "origin"
-        ? "The publisher and service for this entry have not been verified. Administrator setup is required before accounts can be connected."
-        : undefined,
+    id === "origin"
+      ? "The publisher and service for this entry have not been verified. Administrator setup is required before accounts can be connected."
+      : undefined,
   marketplace_verified: [
     "cloudflare",
     "vercel",
@@ -85,7 +83,7 @@ export const CONNECTOR_CATALOG: readonly ConnectorPlugin[] = [
     "Connect your Google account using Google OAuth credentials or an access token.",
     "#dc4537",
     "https://gmailmcp.googleapis.com/mcp/v1",
-    "https://github.com/cursor/plugins/tree/f713f14203cd6420cec13cd7c55c32d598dbab68/third_party/gmail",
+    "https://developers.google.com/workspace/gmail/api/guides/configure-mcp-server",
   ),
   plugin(
     "cloudflare",
@@ -136,10 +134,10 @@ export const CONNECTOR_CATALOG: readonly ConnectorPlugin[] = [
     "google-sheets",
     "Google Sheets",
     "Read and update spreadsheets",
-    "The Cursor-hosted connector requires Cursor authentication. Independent Google account authorization is not available on this endpoint.",
+    "Connect directly to Google Sheets. Developer Preview access, enabled Sheets/MCP APIs and your Google OAuth client are required. You can also supply a Google OAuth access token.",
     "#188653",
-    "https://api.cursor.com/rest-mcp/google-sheets/mcp",
-    "https://github.com/cursor/plugins/tree/f713f14203cd6420cec13cd7c55c32d598dbab68/third_party/google-sheets",
+    "https://sheetsmcp.googleapis.com/mcp/v1",
+    "https://developers.google.com/workspace/sheets/api/guides/configure-mcp-server",
   ),
   plugin(
     "semrush",

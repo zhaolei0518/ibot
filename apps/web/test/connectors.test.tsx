@@ -78,7 +78,7 @@ describe("connector Settings", () => {
       const writes = fixture([], installed);
       render(<Connectors />);
       const card = (
-        await screen.findByRole("heading", { name: "Google Sheets" })
+        await screen.findByRole("heading", { name: "Origin" })
       ).closest("article")!;
       for (let attempt = 0; attempt < 2; attempt++) {
         await userEvent.click(
@@ -87,7 +87,7 @@ describe("connector Settings", () => {
           }),
         );
         const dialog = await screen.findByRole("dialog", {
-          name: "Set up Google Sheets",
+          name: "Set up Origin",
         });
         expect(within(dialog).queryByLabelText("MCP endpoint")).toBeNull();
         expect(
@@ -118,7 +118,7 @@ describe("connector Settings", () => {
       .getByRole("heading", { name: "Google Sheets" })
       .closest("article")!;
     await userEvent.click(
-      within(sheets).getByRole("button", { name: "View setup requirements" }),
+      within(sheets).getByRole("button", { name: "Add account" }),
     );
     await screen.findByRole("heading", { name: "Set up Google Sheets" });
     await userEvent.click(
@@ -169,6 +169,17 @@ describe("connector Settings", () => {
         writes.find((w) => w.url === "/api/connectors/accounts")?.body,
       ).toMatchObject({ plugin_id: "firecrawl", skills_only: true }),
     );
+  });
+  it("uses Google's official Sheets MCP service without a Cursor runtime dependency", () => {
+    const sheets = CONNECTOR_CATALOG.find((p) => p.id === "google-sheets")!;
+    expect(sheets.endpoint).toBe("https://sheetsmcp.googleapis.com/mcp/v1");
+    expect(sheets.unavailable_reason).toBeUndefined();
+    expect(
+      CONNECTOR_CATALOG.every(
+        (p) =>
+          !p.endpoint || !new URL(p.endpoint).hostname.endsWith("cursor.com"),
+      ),
+    ).toBe(true);
   });
   it("uses the verified GitHub address and saves the token in one step", async () => {
     const writes = fixture();

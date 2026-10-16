@@ -145,10 +145,25 @@
       "auth": [
         "bearer"
       ]
+    },
+    "google-sheets": {
+      "url": "https://developers.google.com/workspace/sheets/api/guides/configure-mcp-server",
+      "endpoint": "https://sheetsmcp.googleapis.com/mcp/v1",
+      "auth": [
+        "oauth",
+        "Google OAuth bearer access token"
+      ],
+      "status": "Developer Preview; enable Sheets and Sheets MCP APIs in a Google Cloud project",
+      "live_verification": {
+        "initialize": 200,
+        "tools_list": 200,
+        "tool_count": 6,
+        "unauthenticated_protected_probe": 401,
+        "probe_spreadsheet_id": "invisible-dots-auth-probe-not-a-real-sheet"
+      }
     }
   },
   "external_blockers": {
-    "google-sheets": "Cursor endpoint responds 401: Missing Cursor credential in x-cursor-auth. Ordinary Google OAuth/token is insufficient.",
     "origin": "Publisher/official service not yet identified."
   }
 }
