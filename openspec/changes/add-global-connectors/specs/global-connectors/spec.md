@@ -54,3 +54,14 @@ The system SHALL import reviewed public MCP metadata and SKILL.md files from fix
 #### Scenario: Reject an incomplete import
 - **WHEN** a source response is oversized, unavailable or malformed
 - **THEN** existing resources remain intact and a sanitized import error is shown
+
+### Requirement: Preset services and one-step credentials
+The system SHALL include all 14 catalogue entries by default, preset verified provider endpoints, and accept an access token in the account creation form without requiring endpoint entry. Preset availability SHALL NOT imply successful authorization. Providers requiring platform-owned authentication or without verified service identity SHALL show their setup limitations.
+
+#### Scenario: Token account with a preset endpoint
+- **WHEN** a user selects GitHub and supplies an access token
+- **THEN** the account uses the verified default endpoint and atomically stores the token encrypted before discovering tools
+
+#### Scenario: Cursor-owned Google Sheets authentication
+- **WHEN** a user opens the Google Sheets preset
+- **THEN** the UI explains the Cursor-managed authentication requirement and does not claim ordinary Google OAuth is supported at that service

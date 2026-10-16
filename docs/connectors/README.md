@@ -119,3 +119,11 @@ External acceptance is still pending: HTTPS callback configuration, provider cli
 - `my`: MCP server `cx-75a666aff8729992` connected with one allowed tool, `idots_read_plugin_skill`; actual guest -> host bridge -> imported Firecrawl workflow read completed successfully (audit outcome `ok`, 3 ms). The model chose the skill's declared name `firecrawl`; file/folder names need not equal frontmatter names.
 - The existing model provider remains `openai_compatible`; the Bot produced its response through the configured private gateway.
 - OAuth is disabled until an HTTPS callback origin is supplied. The deployment created no OS users or new home-directory accounts.
+
+### Built-in presets update
+
+All 14 catalogue adapters register automatically on first catalogue load. Twelve have independently documented service presets; account authorization remains required. Endpoints are hidden behind Advanced service settings. Token accounts accept the secret during creation, encrypt it in the same transaction, then discover tools. OAuth accounts still need the approved public callback origin and, where required, their own client registration.
+
+Additional pinned Cursor manifests are from `cursor/plugins` at `f713f14203cd6420cec13cd7c55c32d598dbab68` (Gmail, Sheets, Semrush, Ahrefs, X, GitHub). AIsa uses its official quickstart at https://aisa.one/docs/agent-quickstart.md and `https://mcp.aisa.one/mcp` (OAuth/Bearer). Firecrawl uses the provider-documented `https://mcp.firecrawl.dev/v2/mcp` with an API key; existing Skills-only accounts remain valid.
+
+Google Sheets' official Cursor manifest points to `https://api.cursor.com/rest-mcp/google-sheets/mcp`. An unauthenticated initialization returned 401 with “Missing Cursor credential in x-cursor-auth”. It is a Cursor-managed service; a Google token alone cannot authorize it. This preset therefore shows an explicit setup limitation. Independent Google sign-in still requires a separately configured Workspace service. Origin's service identity remains unverified and is also shown as unavailable. These entries are registered but are not working account integrations.

@@ -121,7 +121,18 @@ export class ConnectorManager {
   private put(id: string, name: string, v: unknown): Promise<void> {
     return this.db.secrets.put(scope(id), name, JSON.stringify(v));
   }
+  private presets?: Promise<void>;
   async overview() {
+    this.presets ??= this.db
+      .transaction(async (tx) => {
+        for (const plugin of CONNECTOR_CATALOG)
+          await tx.connectors.install(plugin.id);
+      })
+      .catch((error) => {
+        this.presets = undefined;
+        throw error;
+      });
+    await this.presets;
     const installed = new Set(await this.db.connectors.installs());
     return {
       plugins: await Promise.all(
@@ -186,6 +197,17 @@ export class ConnectorManager {
   async create(body: Record<string, unknown>) {
     const plugin = CONNECTOR_CATALOG.find((p) => p.id === body.plugin_id);
     if (!plugin) throw invalid("Select a catalogue plugin.");
+    if (plugin.unavailable_reason && !body.endpoint)
+      throw invalid(plugin.unavailable_reason);
+    const token =
+      typeof body.token === "string"
+        ? body.token.trim().replace(/^Bearer\s+/i, "")
+        : undefined;
+    if (
+      body.token !== undefined &&
+      (!token || token.length > 16000 || /[\r\n]/.test(token))
+    )
+      throw invalid("Enter a valid access token.");
     const skillsOnly = plugin.kind === "skills" && body.skills_only === true;
     if (skillsOnly && !(await this.db.connectors.resources(plugin.id)))
       throw invalid("Import this plugin’s resources before using its Skills.");
@@ -208,6 +230,8 @@ export class ConnectorManager {
     await this.db.transaction(async (tx) => {
       await tx.connectors.install(plugin.id);
       await tx.connectors.create(a);
+      if (mode === "token" && token)
+        await tx.secrets.put(scope(id), "bearer", JSON.stringify(token));
     });
     return this.account(id);
   }

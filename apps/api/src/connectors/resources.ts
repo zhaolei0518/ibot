@@ -96,7 +96,7 @@ export async function loadConnectorResources(
             if (
               !meta ||
               typeof meta.name !== "string" ||
-              !/^[a-z0-9][a-z0-9-]{0,63}$/.test(meta.name) ||
+              !/^[A-Za-z0-9][A-Za-z0-9 ._-]{0,127}$/.test(meta.name) ||
               typeof meta.description !== "string" ||
               !meta.description.trim() ||
               meta.description.length > 4096

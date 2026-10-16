@@ -83,13 +83,20 @@ describe("connector Settings", () => {
       for (let attempt = 0; attempt < 2; attempt++) {
         await userEvent.click(
           within(card).getByRole("button", {
-            name: installed ? "Add account" : "Set up",
+            name: "View setup requirements",
           }),
         );
         const dialog = await screen.findByRole("dialog", {
           name: "Set up Google Sheets",
         });
-        expect(within(dialog).getByLabelText("MCP endpoint")).toBeTruthy();
+        expect(within(dialog).queryByLabelText("MCP endpoint")).toBeNull();
+        expect(
+          (
+            within(dialog).getByRole("button", {
+              name: "Save account",
+            }) as HTMLButtonElement
+          ).disabled,
+        ).toBe(true);
         expect(writes).toHaveLength(0);
         await userEvent.click(
           within(dialog).getByRole("button", { name: "Cancel" }),
@@ -111,14 +118,20 @@ describe("connector Settings", () => {
       .getByRole("heading", { name: "Google Sheets" })
       .closest("article")!;
     await userEvent.click(
-      within(sheets).getByRole("button", { name: "Set up" }),
+      within(sheets).getByRole("button", { name: "View setup requirements" }),
     );
     await screen.findByRole("heading", { name: "Set up Google Sheets" });
+    await userEvent.click(
+      screen.getByRole("button", { name: "Advanced service settings" }),
+    );
     fireEvent.change(screen.getByLabelText("MCP endpoint"), {
       target: { value: "https://workspace.example/mcp" },
     });
     fireEvent.change(screen.getByLabelText("Authentication"), {
       target: { value: "token" },
+    });
+    fireEvent.change(screen.getByLabelText("Access token"), {
+      target: { value: "fixture-token" },
     });
     await userEvent.click(screen.getByRole("button", { name: "Save account" }));
     await waitFor(() =>
@@ -140,14 +153,51 @@ describe("connector Settings", () => {
     const card = (
       await screen.findByRole("heading", { name: "Firecrawl" })
     ).closest("article")!;
-    await userEvent.click(within(card).getByRole("button", { name: "Set up" }));
+    await userEvent.click(
+      within(card).getByRole("button", { name: "Add account" }),
+    );
     await screen.findByRole("heading", { name: "Set up Firecrawl" });
     expect(screen.queryByLabelText("MCP endpoint")).toBeNull();
+    await userEvent.click(
+      screen.getByRole("checkbox", {
+        name: "Use imported Skills only (no external MCP account)",
+      }),
+    );
     await userEvent.click(screen.getByRole("button", { name: "Save account" }));
     await waitFor(() =>
       expect(
         writes.find((w) => w.url === "/api/connectors/accounts")?.body,
       ).toMatchObject({ plugin_id: "firecrawl", skills_only: true }),
+    );
+  });
+  it("uses the verified GitHub address and saves the token in one step", async () => {
+    const writes = fixture();
+    render(<Connectors />);
+    const card = (
+      await screen.findByRole("heading", { name: "GitHub" })
+    ).closest("article")!;
+    await userEvent.click(
+      within(card).getByRole("button", { name: "Add account" }),
+    );
+    expect(screen.queryByLabelText("MCP endpoint")).toBeNull();
+    fireEvent.change(screen.getByLabelText("Access token"), {
+      target: { value: "fixture-token" },
+    });
+    await userEvent.click(screen.getByRole("button", { name: "Save account" }));
+    await waitFor(() =>
+      expect(
+        writes.find((w) => w.url === "/api/connectors/accounts")?.body,
+      ).toMatchObject({
+        plugin_id: "github",
+        token: "fixture-token",
+        auth_mode: "token",
+      }),
+    );
+    expect(
+      writes.find((w) => w.url === "/api/connectors/accounts")?.body,
+    ).not.toHaveProperty("endpoint");
+    await waitFor(() =>
+      expect(writes.some((w) => w.url.endsWith("/discover"))).toBe(true),
     );
   });
   it("offers provider authorization without storing login URLs or tokens in localStorage", async () => {

@@ -27,3 +27,10 @@
 - [ ] 5.3 Complete actual provider consents/client registrations and verify real account read/write operations.
 - [ ] 5.4 Configure Google OAuth application and independent Workspace MCP service.
 - [ ] 5.5 Verify independent endpoints/publishers for the unresolved providers and finish their account setup.
+
+## 6. Built-in service presets
+- [x] 6.1 Register all 14 adapters by default without implying account authorization.
+- [x] 6.2 Import six additional pinned Cursor manifests; preset verified addresses and provider auth defaults.
+- [x] 6.3 Support atomic token/account creation with hidden default endpoint and optional advanced override.
+- [x] 6.4 Add AIsa using its official quickstart (OAuth or Bearer API key).
+- [ ] 6.5 Complete independent Google Sheets authorization and identify Origin's official service.

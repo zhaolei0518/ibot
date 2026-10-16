@@ -6,6 +6,42 @@ export interface ConnectorSource {
   skill_paths: string[];
 }
 export const CONNECTOR_SOURCES: Readonly<Record<string, ConnectorSource>> = {
+  gmail: {
+    repo: "cursor/plugins",
+    ref: "f713f14203cd6420cec13cd7c55c32d598dbab68",
+    mcp_path: "third_party/gmail/mcp.json",
+    skill_paths: [],
+  },
+  "google-sheets": {
+    repo: "cursor/plugins",
+    ref: "f713f14203cd6420cec13cd7c55c32d598dbab68",
+    mcp_path: "third_party/google-sheets/mcp.json",
+    skill_paths: ["third_party/google-sheets/skills/google-sheets/SKILL.md"],
+  },
+  semrush: {
+    repo: "cursor/plugins",
+    ref: "f713f14203cd6420cec13cd7c55c32d598dbab68",
+    mcp_path: "third_party/semrush/mcp.json",
+    skill_paths: [],
+  },
+  ahrefs: {
+    repo: "cursor/plugins",
+    ref: "f713f14203cd6420cec13cd7c55c32d598dbab68",
+    mcp_path: "third_party/ahrefs/mcp.json",
+    skill_paths: [],
+  },
+  x: {
+    repo: "cursor/plugins",
+    ref: "f713f14203cd6420cec13cd7c55c32d598dbab68",
+    mcp_path: "third_party/x/mcp.json",
+    skill_paths: ["third_party/x/skills/x-api-mcp-guide/SKILL.md"],
+  },
+  github: {
+    repo: "cursor/plugins",
+    ref: "f713f14203cd6420cec13cd7c55c32d598dbab68",
+    mcp_path: "third_party/github/mcp.json",
+    skill_paths: [],
+  },
   cloudflare: {
     repo: "cloudflare/skills",
     ref: "41e0d19858946d18af9ee2c2feebbe2e11d829ff",

@@ -172,6 +172,29 @@ describe("global connectors: MCP and OAuth integration", () => {
       endpoint: `${origin}/mcp`,
       auth_mode: mode,
     });
+  it("preinstalls all presets and atomically saves a token with its account", async () => {
+    const overview = await manager.overview();
+    expect(overview.plugins).toHaveLength(14);
+    expect(overview.plugins.every((p) => p.installed)).toBe(true);
+    const a = await manager.create({
+      plugin_id: "github",
+      label: "One-step token",
+      auth_mode: "token",
+      token: acceptedToken,
+      endpoint: `${origin}/mcp`,
+    });
+    expect(JSON.stringify(a)).not.toContain(acceptedToken);
+    const connected = await manager.discover(a.id);
+    expect(connected.status).toBe("connected");
+    await expect(
+      manager.create({
+        plugin_id: "github",
+        label: "Invalid token",
+        auth_mode: "token",
+        token: "x\ny",
+      }),
+    ).rejects.toThrow("valid access token");
+  });
   it("requires control-plane authentication and exposes all 14 catalogue entries", async () => {
     expect((await api.inject({ url: "/api/connectors" })).statusCode).toBe(401);
     const r = await api.inject({

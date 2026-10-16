@@ -1,7 +1,73 @@
 {
   "checked_on": "2026-10-16",
-  "method": "loadConnectorResources against pinned public sources",
+  "method": "loadConnectorResources against pinned public sources plus unauthenticated endpoint probes",
   "results": [
+    {
+      "id": "gmail",
+      "ref": "f713f14203cd6420cec13cd7c55c32d598dbab68",
+      "skills": 0,
+      "servers": [
+        {
+          "name": "gmail",
+          "url": "https://gmailmcp.googleapis.com/mcp/v1"
+        }
+      ]
+    },
+    {
+      "id": "google-sheets",
+      "ref": "f713f14203cd6420cec13cd7c55c32d598dbab68",
+      "skills": 1,
+      "servers": [
+        {
+          "name": "google-sheets",
+          "url": "https://api.cursor.com/rest-mcp/google-sheets/mcp"
+        }
+      ]
+    },
+    {
+      "id": "semrush",
+      "ref": "f713f14203cd6420cec13cd7c55c32d598dbab68",
+      "skills": 0,
+      "servers": [
+        {
+          "name": "semrush",
+          "url": "https://mcp.semrush.com/v2/mcp"
+        }
+      ]
+    },
+    {
+      "id": "ahrefs",
+      "ref": "f713f14203cd6420cec13cd7c55c32d598dbab68",
+      "skills": 0,
+      "servers": [
+        {
+          "name": "ahrefs",
+          "url": "https://api.ahrefs.com/mcp/mcp"
+        }
+      ]
+    },
+    {
+      "id": "x",
+      "ref": "f713f14203cd6420cec13cd7c55c32d598dbab68",
+      "skills": 1,
+      "servers": [
+        {
+          "name": "x",
+          "url": "https://api.x.com/mcp"
+        }
+      ]
+    },
+    {
+      "id": "github",
+      "ref": "f713f14203cd6420cec13cd7c55c32d598dbab68",
+      "skills": 0,
+      "servers": [
+        {
+          "name": "github",
+          "url": "https://api.githubcopilot.com/mcp/"
+        }
+      ]
+    },
     {
       "id": "cloudflare",
       "ref": "41e0d19858946d18af9ee2c2feebbe2e11d829ff",
@@ -63,5 +129,26 @@
         }
       ]
     }
-  ]
+  ],
+  "provider_docs": {
+    "aisa": {
+      "url": "https://aisa.one/docs/agent-quickstart.md",
+      "endpoint": "https://mcp.aisa.one/mcp",
+      "auth": [
+        "oauth",
+        "bearer"
+      ]
+    },
+    "firecrawl": {
+      "url": "https://github.com/firecrawl/firecrawl-mcp-server",
+      "endpoint": "https://mcp.firecrawl.dev/v2/mcp",
+      "auth": [
+        "bearer"
+      ]
+    }
+  },
+  "external_blockers": {
+    "google-sheets": "Cursor endpoint responds 401: Missing Cursor credential in x-cursor-auth. Ordinary Google OAuth/token is insufficient.",
+    "origin": "Publisher/official service not yet identified."
+  }
 }

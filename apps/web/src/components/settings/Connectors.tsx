@@ -156,9 +156,18 @@ export function Connectors() {
               cancel={() => setSelected(undefined)}
               submit={(body) =>
                 action(async () => {
-                  await connectorRequest("connectors/accounts", "POST", body);
+                  const account = await connectorRequest<ConnectorAccount>(
+                    "connectors/accounts",
+                    "POST",
+                    body,
+                  );
                   setSelected(undefined);
                   setTab("accounts");
+                  if ((body as { token?: string }).token)
+                    await connectorRequest(
+                      `connectors/accounts/${account.id}/discover`,
+                      "POST",
+                    );
                 })
               }
             />
@@ -168,8 +177,8 @@ export function Connectors() {
       {tab === "catalogue" && data && (
         <>
           <p className="text-xs text-muted-foreground">
-            Selected from your Cursor plugin list. Each account connects to its
-            own MCP service. Availability depends on the provider.
+            All 14 connectors are included. Verified service addresses are
+            preset; connect an account to enable tools for your Dots.
           </p>
           <div className="grid gap-2 sm:grid-cols-2">
             {data.plugins.map((p) => (
@@ -248,7 +257,9 @@ export function Connectors() {
                       setSelected(p);
                     }}
                   >
-                    {p.installed ? "Add account" : "Set up"}
+                    {p.unavailable_reason
+                      ? "View setup requirements"
+                      : "Add account"}
                   </Button>
                 </div>
               </article>
@@ -330,8 +341,11 @@ function AccountForm({
 }) {
   const [label, setLabel] = useState(plugin.name);
   const [endpoint, setEndpoint] = useState(plugin.endpoint ?? "");
-  const [mode, setMode] = useState("oauth");
-  const [skillsOnly, setSkillsOnly] = useState(plugin.kind === "skills");
+  const [mode, setMode] = useState<string>(plugin.default_auth ?? "oauth");
+  const [token, setToken] = useState("");
+  const [advanced, setAdvanced] = useState(false);
+  const [skillsOnly, setSkillsOnly] = useState(false);
+  const blocked = Boolean(plugin.unavailable_reason) && !advanced;
   return (
     <form
       className="space-y-3"
@@ -340,14 +354,20 @@ function AccountForm({
         void submit({
           plugin_id: plugin.id,
           label,
-          endpoint,
+          ...(advanced ? { endpoint } : {}),
           auth_mode: mode,
           skills_only: skillsOnly,
+          ...(!skillsOnly && mode === "token" ? { token } : {}),
         });
       }}
     >
       <DialogTitle>Set up {plugin.name}</DialogTitle>
       <DialogDescription>{plugin.setup}</DialogDescription>
+      {plugin.unavailable_reason && (
+        <p role="status" className="rounded-md border p-3 text-sm">
+          {plugin.unavailable_reason}
+        </p>
+      )}
       {plugin.docs_url && (
         <a
           className="text-xs underline"
@@ -380,16 +400,26 @@ function AccountForm({
       )}
       {!skillsOnly && (
         <>
-          <label className="block space-y-1 text-xs">
-            MCP endpoint
-            <Input
-              type="url"
-              value={endpoint}
-              onChange={(e) => setEndpoint(e.target.value)}
-              placeholder="https://provider.example/mcp"
-              required
-            />
-          </label>
+          <button
+            type="button"
+            className="text-xs underline"
+            aria-expanded={advanced}
+            onClick={() => setAdvanced(!advanced)}
+          >
+            Advanced service settings
+          </button>
+          {advanced && (
+            <label className="block space-y-1 text-xs">
+              MCP endpoint
+              <Input
+                type="url"
+                value={endpoint}
+                onChange={(e) => setEndpoint(e.target.value)}
+                placeholder="https://provider.example/mcp"
+                required
+              />
+            </label>
+          )}
           <label className="block space-y-1 text-xs">
             Authentication
             <select
@@ -404,6 +434,19 @@ function AccountForm({
           </label>
         </>
       )}
+      {!skillsOnly && mode === "token" && !blocked && (
+        <label className="block space-y-1 text-xs">
+          Access token
+          <Input
+            type="password"
+            autoComplete="off"
+            value={token}
+            onChange={(e) => setToken(e.target.value)}
+            required
+            maxLength={16000}
+          />
+        </label>
+      )}
       {skillsOnly && (
         <p className="text-xs text-muted-foreground">
           Import resources on the plugin card first. After saving, use Refresh
@@ -417,8 +460,8 @@ function AccountForm({
         </p>
       )}
       <div className="flex gap-2">
-        <Button size="sm" disabled={busy}>
-          Save account
+        <Button size="sm" disabled={busy || blocked}>
+          {busy ? "Connecting…" : "Save account"}
         </Button>
         <Button size="sm" type="button" variant="ghost" onClick={cancel}>
           Cancel

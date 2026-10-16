@@ -19,3 +19,7 @@ Google Sheets setup was inserted above the catalogue inside the Settings scroll 
 ## Immediate account setup dialog
 
 The inline visibility fix did not meet the expected popup interaction. Set up and Add account now open a modal synchronously without installing or reloading first (account creation already registers the plugin transactionally). Network requests have a 30-second timeout; catalogue reload no longer holds the action lock; save failures appear inside the dialog. Regression tests cover both installed/uninstalled entries and reopening: 6 tests passed. Project typechecks passed.
+
+## Built-in services and one-step tokens
+
+All 14 adapters now register on catalogue load. Twelve independent endpoint presets are documented; Sheets is explicitly blocked by Cursor-owned x-cursor-auth and Origin awaits identity. AIsa preset was verified against https://aisa.one/docs/agent-quickstart.md (OAuth/Bearer). Twelve pinned Cursor resource sets loaded successfully, including the official X skill with its human-readable name. Token creation is transactional and encrypted; a real HTTP MCP fixture verifies discovery immediately after creation. Six affected regression files: 66 tests passed. Full project typechecks and strict OpenSpec validation passed. No provider user consent or paid AIsa call was performed.

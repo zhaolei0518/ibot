@@ -41,6 +41,16 @@ describe("pinned marketplace resource import", () => {
       ),
     ).toBe(true);
   });
+  it("accepts the official X plugin's human-readable skill name", async () => {
+    const result = await loadConnectorResources(
+      { ...source, mcp_path: null },
+      async () =>
+        new Response(
+          "---\nname: X MCP guide\ndescription: X instructions\n---\nRead before use.",
+        ),
+    );
+    expect(result.skills[0]?.name).toBe("X MCP guide");
+  });
   it("accepts direct server maps and refuses credential-bearing URLs and oversized resources", async () => {
     const direct = await loadConnectorResources(
       { ...source, skill_paths: [] },

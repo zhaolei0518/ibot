@@ -11,6 +11,8 @@ export interface ConnectorPlugin {
   marketplace_verified: boolean;
   source?: ConnectorSource;
   endpoint?: string;
+  default_auth?: "oauth" | "token" | "none";
+  unavailable_reason?: string;
   docs_url?: string;
   kind: "connector" | "skills";
   setup: string;
@@ -35,6 +37,15 @@ const plugin = (
   docs_url,
   kind,
   source: CONNECTOR_SOURCES[id],
+  default_auth: ["github", "firecrawl", "x", "gmail"].includes(id)
+    ? "token"
+    : "oauth",
+  unavailable_reason:
+    id === "google-sheets"
+      ? "Cursor’s Google Sheets service requires Cursor-managed authentication (x-cursor-auth). Independent Google OAuth needs a separately configured Workspace service."
+      : id === "origin"
+        ? "The publisher and service for this entry have not been verified. Administrator setup is required before accounts can be connected."
+        : undefined,
   marketplace_verified: [
     "cloudflare",
     "vercel",
@@ -42,6 +53,12 @@ const plugin = (
     "gitbook",
     "notion",
     "firecrawl",
+    "gmail",
+    "google-sheets",
+    "semrush",
+    "ahrefs",
+    "x",
+    "github",
   ].includes(id),
   marketplace_url: [
     "cloudflare",
@@ -50,6 +67,12 @@ const plugin = (
     "gitbook",
     "notion",
     "firecrawl",
+    "gmail",
+    "google-sheets",
+    "semrush",
+    "ahrefs",
+    "x",
+    "github",
   ].includes(id)
     ? `https://cursor.com/marketplace/${id}`
     : "https://cursor.com/marketplace",
@@ -59,10 +82,10 @@ export const CONNECTOR_CATALOG: readonly ConnectorPlugin[] = [
     "gmail",
     "Gmail",
     "Search and manage email",
-    "Configure an independently accessible Google Workspace MCP service and its Google OAuth application.",
+    "Connect your Google account using Google OAuth credentials or an access token.",
     "#dc4537",
-    undefined,
-    "https://github.com/taylorwilsdon/google_workspace_mcp",
+    "https://gmailmcp.googleapis.com/mcp/v1",
+    "https://github.com/cursor/plugins/tree/f713f14203cd6420cec13cd7c55c32d598dbab68/third_party/gmail",
   ),
   plugin(
     "cloudflare",
@@ -113,38 +136,43 @@ export const CONNECTOR_CATALOG: readonly ConnectorPlugin[] = [
     "google-sheets",
     "Google Sheets",
     "Read and update spreadsheets",
-    "Configure a Google Workspace MCP service. Self-hosting requires your own Google OAuth application.",
+    "The Cursor-hosted connector requires Cursor authentication. Independent Google account authorization is not available on this endpoint.",
     "#188653",
-    undefined,
-    "https://github.com/taylorwilsdon/google_workspace_mcp",
+    "https://api.cursor.com/rest-mcp/google-sheets/mcp",
+    "https://github.com/cursor/plugins/tree/f713f14203cd6420cec13cd7c55c32d598dbab68/third_party/google-sheets",
   ),
   plugin(
     "semrush",
     "Semrush",
     "SEO and marketing research",
-    "Enter the MCP endpoint supplied by your Semrush integration and check subscription access.",
+    "Sign in to Semrush or provide an access token. Your subscription controls available tools.",
     "#e76b30",
+    "https://mcp.semrush.com/v2/mcp",
   ),
   plugin(
     "ahrefs",
     "Ahrefs",
     "Search and backlink research",
-    "Enter the official MCP endpoint for your account and check subscription access.",
+    "Sign in to Ahrefs or provide an API token. Your subscription controls available tools.",
     "#2774a7",
+    "https://api.ahrefs.com/mcp/mcp",
   ),
   plugin(
     "x",
     "X",
     "Access your X integration",
-    "The screenshot confirms this plugin; its independent MCP endpoint must be configured. Cursor account tokens cannot be reused.",
+    "Use your own X access token or registered OAuth client. Cursor’s registered client cannot be reused.",
     "#555555",
+    "https://api.x.com/mcp",
   ),
   plugin(
     "aisa",
     "aisa",
-    "Connected aisa tools",
-    "Confirm the plugin publisher and independent MCP endpoint before connecting.",
+    "Search data services and use AIsa tools",
+    "Sign in with AIsa OAuth, or enter your AIsa API key. Service calls may incur usage charges.",
     "#777777",
+    "https://mcp.aisa.one/mcp",
+    "https://aisa.one/docs/agent-quickstart.md",
   ),
   plugin(
     "github",
@@ -166,9 +194,9 @@ export const CONNECTOR_CATALOG: readonly ConnectorPlugin[] = [
     "firecrawl",
     "Firecrawl",
     "Web research skills",
-    "Import the ten Skills from the pinned Cursor package, then add a Skills-only connection. An external Firecrawl MCP can also be configured.",
+    "Connect using a Firecrawl API key, or use the imported workflow Skills without an external account.",
     "#e66d36",
-    undefined,
+    "https://mcp.firecrawl.dev/v2/mcp",
     "https://github.com/firecrawl/firecrawl-mcp-server",
     "skills",
   ),
