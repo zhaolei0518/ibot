@@ -62,6 +62,21 @@ describe.each(testAdapters())("control-plane API (%s)", (kind) => {
     await t?.drop();
   });
 
+  it("serves finite update pages and resumes from a cursor", async () => {
+    const initial = await app.inject({ method: "GET", url: "/api/event-updates", headers: { authorization: `Bearer ${TOKEN}` } });
+    expect(initial.statusCode).toBe(200);
+    const start = initial.json();
+    expect(start.events).toEqual([]);
+    const dot = await api.createDot(yaml("poll-updates-fixture"));
+    const page = await app.inject({ method: "GET", url: `/api/event-updates?after=${start.cursor}`, headers: { authorization: `Bearer ${TOKEN}` } });
+    expect(page.statusCode).toBe(200);
+    const result = page.json();
+    expect(result.events.some((e: StoredEvent) => e.dot_id === dot.id)).toBe(true);
+    expect(result.cursor).toBeGreaterThan(start.cursor);
+    const invalid = await app.inject({ method: "GET", url: "/api/event-updates?after=bad", headers: { authorization: `Bearer ${TOKEN}` } });
+    expect(invalid.statusCode).toBe(400);
+  });
+
   async function readyDot(name: string, idle?: string) {
     const dot = await api.createDot(yaml(name, idle));
     await waitUntilSettledReady(scheduler, driver, dot.id, name);

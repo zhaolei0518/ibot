@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ActivityIcon } from "lucide-react";
 import { api } from "../lib/api";
+import { pollEvents } from "../lib/poll-events";
 import { cn } from "../lib/utils";
 import type { StoredEvent } from "../lib/types";
 import { StatusIcon } from "./shell/StatusIcon";
@@ -30,6 +31,7 @@ export function DotEventScope({ dotId, children }: { dotId: string; children: Re
 /** One SSE connection for every Dot, kept for as long as the app's pages are open and shared by every component below it. */
 export function EventStreamProvider({ children }: { children: ReactNode }) {
   const listeners = useRef(new Set<Listener>());
+  const cursor = useRef<number | undefined>(undefined);
   const [status, setStatus] = useState<StreamStatus>("connecting");
   const [detail, setDetail] = useState("");
   const [visible, setVisible] = useState(true);
@@ -51,7 +53,12 @@ export function EventStreamProvider({ children }: { children: ReactNode }) {
     void (async () => {
       try {
         // The SDK reconnects by itself and resumes after the last event it delivered.
-        for await (const event of api.stream({
+        const updates = location.protocol === "http:" && !["localhost", "127.0.0.1", "[::1]"].includes(location.hostname)
+          ? pollEvents
+          : api.stream.bind(api);
+        for await (const event of updates({
+          after: cursor.current,
+          onCursor: (value: number) => { cursor.current = value; },
           signal: controller.signal,
           onOpen: () => {
             setStatus("open");
@@ -62,6 +69,7 @@ export function EventStreamProvider({ children }: { children: ReactNode }) {
             setDetail(error.message);
           },
         })) {
+          cursor.current = event.id;
           for (const listener of listeners.current) listener(event);
         }
         setStatus("closed");

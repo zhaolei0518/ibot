@@ -470,6 +470,18 @@ export function buildServer(options: ServerOptions): FastifyInstance {
       .send(Buffer.from(content));
   });
 
+  // Finite updates for HTTP/1.1 browsers: no socket remains occupied between polls.
+  app.get<{ Querystring: { after?: string } }>("/api/event-updates", async (request, reply) => {
+    reply.header("cache-control", "no-store");
+    const after = intParam(request.query.after, "after");
+    if (after === undefined) {
+      const latest = await scheduler.events.query({ order: "desc", limit: 1 });
+      return { events: [], cursor: latest[0]?.id ?? 0 };
+    }
+    const events = await scheduler.events.query({ after, limit: 500 });
+    return { events, cursor: events.at(-1)?.id ?? after };
+  });
+
   app.get<{ Querystring: { dot_id?: string; after?: string } }>("/api/stream", async (request, reply) => {
     const dotId = request.query.dot_id ? await scheduler.historyDotId(request.query.dot_id) : undefined;
     // EventSource sends the last id it saw when it reconnects; it wins over the query.
