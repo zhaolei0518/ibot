@@ -38,6 +38,14 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
     }
     throw error;
   }
+  const connectorWrite = path[0] === "connectors" && request.method !== "GET" && request.method !== "HEAD";
+  const suppliedId = request.headers.get("x-connector-request-id") ?? "";
+  const connectorRequestId = /^[a-f0-9-]{36}$/.test(suppliedId) ? suppliedId : crypto.randomUUID();
+  const started = Date.now();
+  const trace = (outcome: string) => {
+    if (connectorWrite) console.info(JSON.stringify({ event: "connector_request", request_id: connectorRequestId, method: request.method, path: `/api/${path.map(encodeURIComponent).join("/")}`, outcome, duration_ms: Date.now() - started }));
+  };
+  trace("received");
   const hasBody = request.method !== "GET" && request.method !== "HEAD";
   let upstream: Response;
   try {
@@ -51,12 +59,14 @@ async function proxy(request: Request, context: RouteContext): Promise<Response>
       cache: "no-store",
     });
   } catch (error) {
+    trace(request.signal.aborted ? "browser_aborted" : "upstream_failed");
     if (request.signal.aborted) return new Response(null, { status: 499 });
     const reason = (error as Error & { cause?: { code?: string } }).cause?.code ?? (error as Error).message;
     console.error(`[web proxy] ${request.method} ${target} failed: ${reason}`);
     return errorResponse(502, "api_unreachable", `the control plane API at ${apiBaseUrl()} did not answer (${reason})`);
   }
 
+  trace(`upstream_${upstream.status}`);
   return new Response(upstream.body, {
     status: upstream.status,
     statusText: upstream.statusText,
