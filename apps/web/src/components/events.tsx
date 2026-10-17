@@ -32,8 +32,19 @@ export function EventStreamProvider({ children }: { children: ReactNode }) {
   const listeners = useRef(new Set<Listener>());
   const [status, setStatus] = useState<StreamStatus>("connecting");
   const [detail, setDetail] = useState("");
+  const [visible, setVisible] = useState(true);
+  useEffect(() => {
+    const update = () => setVisible(document.visibilityState !== "hidden");
+    update();
+    document.addEventListener("visibilitychange", update);
+    return () => document.removeEventListener("visibilitychange", update);
+  }, []);
+
 
   useEffect(() => {
+    // HTTP/1.1 has a small per-origin connection pool shared across tabs.
+    // Release background streams so normal API calls can reach the server.
+    if (!visible) return;
     const controller = new AbortController();
     setStatus("connecting");
     setDetail("");
@@ -61,7 +72,7 @@ export function EventStreamProvider({ children }: { children: ReactNode }) {
       }
     })();
     return () => controller.abort();
-  }, []);
+  }, [visible]);
 
   const subscribe = useCallback((listener: Listener) => {
     listeners.current.add(listener);
