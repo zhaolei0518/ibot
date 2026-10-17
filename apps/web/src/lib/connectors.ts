@@ -28,7 +28,14 @@ export async function connectorRequest<T>(
           : path === "connectors"
             ? "Refresh connector accounts"
             : "Update connector";
-  const requestId = crypto.randomUUID();
+  // randomUUID is restricted to secure contexts; this UI also supports LAN HTTP.
+  // This ID is only for request tracing, never authentication or OAuth state.
+  const bytes = new Uint8Array(16);
+  globalThis.crypto.getRandomValues(bytes);
+  bytes[6] = (bytes[6]! & 0x0f) | 0x40;
+  bytes[8] = (bytes[8]! & 0x3f) | 0x80;
+  const hex = Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("");
+  const requestId = `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
   const signal = AbortSignal.timeout(30_000);
   let response: Response;
   let result: T & { message?: string };

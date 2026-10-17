@@ -33,3 +33,12 @@ it("identifies a tool discovery failure separately from account creation", async
     connectorRequest("connectors/accounts/c1/discover", "POST"),
   ).rejects.toThrow("Discover provider tools: Provider unavailable (HTTP 502;");
 });
+it("sends requests on LAN HTTP where randomUUID is unavailable", async () => {
+  const browserCrypto = globalThis.crypto;
+  vi.stubGlobal("crypto", { getRandomValues: browserCrypto.getRandomValues.bind(browserCrypto) });
+  const fetcher = vi.fn().mockResolvedValue(Response.json({ accounts: [] }));
+  vi.stubGlobal("fetch", fetcher);
+  await expect(connectorRequest("connectors")).resolves.toEqual({ accounts: [] });
+  const headers = fetcher.mock.calls[0]![1].headers;
+  expect(headers["X-Connector-Request-Id"]).toMatch(/^[a-f0-9]{8}-[a-f0-9]{4}-4[a-f0-9]{3}-[89ab][a-f0-9]{3}-[a-f0-9]{12}$/);
+});
