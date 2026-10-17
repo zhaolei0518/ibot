@@ -11,12 +11,14 @@ it("identifies the failed operation and request without exposing credentials", a
   const error = await connectorRequest("connectors/accounts", "POST", {
     token: "private-test-token",
   }).catch((e) => e as Error);
-  expect(error.message).toContain(
+  expect(error).toBeInstanceOf(Error);
+  const message = (error as Error).message;
+  expect(message).toContain(
     "Save account: no response within 30 seconds",
   );
-  expect(error.message).toContain("POST /api/connectors/accounts");
-  expect(error.message).toContain("Check Accounts before retrying");
-  expect(error.message).not.toContain("private-test-token");
+  expect(message).toContain("POST /api/connectors/accounts");
+  expect(message).toContain("Check Accounts before retrying");
+  expect(message).not.toContain("private-test-token");
 });
 it("identifies a tool discovery failure separately from account creation", async () => {
   vi.stubGlobal(
