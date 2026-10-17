@@ -13,5 +13,5 @@ it("resumes after a baseline cursor without holding a streaming response", async
  expect(fetcher.mock.calls[1]![0]).toBe("/api/event-updates?after=42");
  expect(onCursor).toHaveBeenCalledWith(43);
  controller.abort();
- await stream.return();
+ await stream.return(undefined);
 });
