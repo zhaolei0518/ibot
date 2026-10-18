@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
+import { AccountSession } from "../components/account-session";
 import { Toaster } from "../components/ui/sonner";
 import { THEME_BOOTSTRAP } from "../lib/theme";
 import "@fontsource/geist-sans/400.css";
@@ -33,6 +34,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
           Skip to content
         </a>
         {children}
+        <AccountSession />
         <Toaster />
       </body>
     </html>

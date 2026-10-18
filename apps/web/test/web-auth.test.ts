@@ -1,0 +1,40 @@
+import { afterEach, describe, expect, it } from "vitest";
+import { mkdtemp, rm, mkdir, writeFile, readdir, readFile } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { scryptSync } from "node:crypto";
+import { checkPassword, createSession, validSession, revokeSession, safeReturnPath } from "../src/lib/web-auth";
+const oldHome = process.env.INVISIBLE_DOTS_HOME;
+let home: string;
+afterEach(async () => { if (oldHome === undefined) delete process.env.INVISIBLE_DOTS_HOME; else process.env.INVISIBLE_DOTS_HOME = oldHome; if (home) await rm(home, { recursive: true, force: true }); });
+describe("web authentication", () => {
+ it("fails closed, verifies passwords, revokes sessions, and invalidates them on password reset", async () => {
+  home = await mkdtemp(join(tmpdir(), "dot-auth-")); process.env.INVISIBLE_DOTS_HOME = home;
+  expect(await validSession("a".repeat(64))).toBe(false);
+  expect(await checkPassword("admin", "secret")).toBe(false);
+  const dir = join(home, "config"); await mkdir(dir);
+  const salt = "a".repeat(32);
+  const account = { username: "admin", salt, passwordHash: scryptSync("secret", salt, 64).toString("hex") };
+  await writeFile(join(dir, "web-account.json"), JSON.stringify(account));
+  expect(await checkPassword("admin", "wrong")).toBe(false);
+  expect(await checkPassword("wrong", "secret")).toBe(false);
+  expect(await checkPassword("admin", "secret")).toBe(true);
+  const token = await createSession(); expect(await validSession(token)).toBe(true);
+  expect(await validSession(token.slice(1))).toBe(false);
+  const files = await readdir(join(dir, "web-sessions"));
+  expect(await readFile(join(dir, "web-sessions", files[0]!), "utf8")).not.toContain(token);
+  const sessionFile = join(dir, "web-sessions", files[0]!);
+  const session = JSON.parse(await readFile(sessionFile, "utf8"));
+  await writeFile(sessionFile, JSON.stringify({ ...session, expires: Date.now() - 1 }));
+  expect(await validSession(token)).toBe(false);
+  await revokeSession(token); expect(await validSession(token)).toBe(false);
+  const other = await createSession();
+  account.passwordHash = scryptSync("new-secret", salt, 64).toString("hex");
+  await writeFile(join(dir, "web-account.json"), JSON.stringify(account));
+  expect(await validSession(other)).toBe(false);
+ });
+ it("refuses external redirects", () => {
+  for (const path of ["//evil.test", "https://evil.test", "/\\evil.test", "/login", "/auth/logout"]) expect(safeReturnPath(path)).toBe("/");
+  expect(safeReturnPath("/dots/my/chat?view=1")).toBe("/dots/my/chat?view=1");
+ });
+});

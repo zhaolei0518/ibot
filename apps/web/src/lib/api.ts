@@ -11,7 +11,13 @@ export { ApiError };
 export type ComputerAction = "start" | "stop" | "reboot";
 
 // fetch is looked up at each call, not bound once: a test (or a polyfill) that replaces it later is the one used.
-export const api = new InvisibleDotsClient({ baseUrl: "", fetch: (input, init) => fetch(input, init) });
+export const api = new InvisibleDotsClient({ baseUrl: "", fetch: async (input, init) => {
+  const response = await fetch(input, init);
+  if (response.status === 401 && typeof window !== "undefined" && window.location.pathname !== "/login") {
+    window.location.assign(`/login?next=${encodeURIComponent(window.location.pathname + window.location.search)}`);
+  }
+  return response;
+} });
 
 export function computerAction(client: InvisibleDotsClient, dotId: string, action: ComputerAction): Promise<unknown> {
   switch (action) {
