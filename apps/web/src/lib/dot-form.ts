@@ -34,8 +34,8 @@ export const DEFAULT_MODEL: DotConfig["model"] = {
   "id": "z-ai/glm-5.3-flash",
   "base_url": "https://llm.api.zyuncs.com/v1",
   "provider": "openai_compatible",
-  "context_tokens": 32000,
-  "max_output_tokens": 1024,
+  "context_tokens": 1048576,
+  "max_output_tokens": 8192,
   "input_cost_per_million": 2,
   "output_cost_per_million": 8
 };
